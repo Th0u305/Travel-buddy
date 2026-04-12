@@ -1,14 +1,6 @@
 module.exports = {
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
-      },
-    ],
+    remotePatterns: [new URL('https://res.cloudinary.com/**'), new URL('https://lh3.googleusercontent.com/**')],
   },
+  crossOrigin: "anonymous",
 }

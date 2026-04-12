@@ -6,17 +6,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Plus, Loader2, Map } from 'lucide-react';
 import Link from 'next/link';
 
-export default function Trips() {
+export default function AllTrips() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
-
-
 
   const upcoming = plans.filter(p => p === 'upcoming');
   const ongoing = plans.filter(p => p === 'ongoing');
   const completed = plans.filter(p => p === 'completed');
-
-
 
   return (
     <div className="pt-24 pb-16 px-4">

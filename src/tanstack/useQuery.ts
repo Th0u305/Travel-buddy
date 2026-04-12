@@ -1,14 +1,13 @@
 
 import { axiosInstance } from '@/lib/axios/httpUtils';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { envVars } from '../config/env';
 import { useUserStore } from '../store/zustand.store';
 
-export default function useGetUserProfile() {
+export function useGetUserProfile() {
 
     const {setUserData} = useUserStore()
   
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { data: user , refetch : userProfileRefetch, isLoading} = useQuery({
         queryKey: ["userProfile"],
         queryFn : async ()=>{
@@ -17,7 +16,7 @@ export default function useGetUserProfile() {
             return res?.data?.data
         },
         retry : 1,
-    })
-    
-    return { userProfileRefetch, isLoading}
+        enabled : true
+        })    
+    return { userProfileRefetch, isLoading, user}
 } 

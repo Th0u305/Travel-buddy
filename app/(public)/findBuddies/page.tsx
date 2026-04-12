@@ -67,7 +67,7 @@ export default function FindBuddies() {
   return (
    <>
       {/* Main Content */}
-      <main className="pt-24 pb-12 px-8">
+      <main className="pt-24 pb-12 px-8 max-w-[1440px] mx-auto min-h-screen">
         <div className="flex flex-col md:flex-row gap-8">
           
           {/* Sidebar / Filters */}

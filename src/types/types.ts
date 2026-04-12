@@ -20,3 +20,19 @@ export interface UserTs {
     is_deleted: boolean;
   };
 }
+
+export interface CreateTravelPlanTs {
+  cover_url: string;
+  trip_title: string;
+  country: string;
+  city: string;
+  travel_type: string;
+  start_date: string;
+  end_date: string;
+  min_budget: number;
+  max_budget: number;
+  max_travelers: number;
+  trip_description: string;
+  looking_for_buddy : boolean;
+  tags: string[];
+}
