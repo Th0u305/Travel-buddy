@@ -1,56 +1,70 @@
-import { Compass } from 'lucide-react';
-import Link from 'next/link';
-
 export default function Footer() {
   return (
-    <footer className="bg-muted/40 border-t mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="md:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-                <Compass className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <span className="text-lg font-bold font-display">TravelBuddy</span>
-            </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Connect with fellow travelers, share adventures, and explore the world together.
+      <footer className="bg-[#f3f4ee] pt-15 pb-15 md:pb-15">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 border-t border-outline-variant/10 pt-12">
+          <div className="space-y-6">
+            <div className="text-2xl font-bold tracking-tight text-primary">
+              Explorer
+            </div>
+            <p className="text-on-surface-variant text-sm leading-relaxed">
+              Curating the world&aposs most breathtaking adventures for the modern
+              traveler. Join the movement.
             </p>
-          </div>
-          <div>
-            <h4 className="font-semibold text-sm mb-4">Discover</h4>
-            <div className="space-y-2.5">
-              <Link href="/explore" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Explore Travelers</Link>
-              <Link href="/find-buddy" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Find Travel Buddy</Link>
-              <Link href="/subscription" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">Premium Plans</Link>
+            <div className="flex gap-4">
+              <span className="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">
+                public
+              </span>
+              <span className="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">
+                camera_outdoor
+              </span>
+              <span className="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">
+                hiking
+              </span>
             </div>
           </div>
-          <div>
-            <h4 className="font-semibold text-sm mb-4">Company</h4>
-            <div className="space-y-2.5">
-              <span className="block text-sm text-muted-foreground">About Us</span>
-              <span className="block text-sm text-muted-foreground">Careers</span>
-              <span className="block text-sm text-muted-foreground">Contact</span>
-            </div>
+          <div className="space-y-4">
+            <h4 className="font-bold">Discover</h4>
+            <ul className="text-on-surface-variant text-sm space-y-2">
+              <li className="hover:text-primary cursor-pointer transition-colors">
+                Destinations
+              </li>
+              <li className="hover:text-primary cursor-pointer transition-colors">
+                Trip Types
+              </li>
+              <li className="hover:text-primary cursor-pointer transition-colors">
+                Host Program
+              </li>
+            </ul>
           </div>
-          <div>
-            <h4 className="font-semibold text-sm mb-4">Legal</h4>
-            <div className="space-y-2.5">
-              <span className="block text-sm text-muted-foreground">Privacy Policy</span>
-              <span className="block text-sm text-muted-foreground">Terms of Service</span>
-              <span className="block text-sm text-muted-foreground">Cookie Policy</span>
+          <div className="space-y-4">
+            <h4 className="font-bold">Community</h4>
+            <ul className="text-on-surface-variant text-sm space-y-2">
+              <li className="hover:text-primary cursor-pointer transition-colors">
+                Member Stories
+              </li>
+              <li className="hover:text-primary cursor-pointer transition-colors">
+                Safety Guidelines
+              </li>
+              <li className="hover:text-primary cursor-pointer transition-colors">
+                Help Center
+              </li>
+            </ul>
+          </div>
+          <div className="space-y-6">
+            <h4 className="font-bold">Stay Inspired</h4>
+            <div className="flex bg-surface px-4 py-2 rounded-xl border border-outline-variant/20">
+              <input
+                className="bg-transparent border-none focus:ring-0 text-sm w-full"
+                placeholder="Your email"
+                type="text"
+              />
+              <button className="text-primary font-bold text-sm">Join</button>
             </div>
           </div>
         </div>
-        <div className="border-t mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">© 2026 TravelBuddy. All rights reserved.</p>
-          <div className="flex gap-6">
-            <span className="text-xs text-muted-foreground">Twitter</span>
-            <span className="text-xs text-muted-foreground">Instagram</span>
-            <span className="text-xs text-muted-foreground">Facebook</span>
-          </div>
+        <div className="max-w-7xl mx-auto px-6 mt-20 pt-8 border-t border-outline-variant/10 text-center text-xs text-outline">
+          © 2024 Explorer. Built for the wild at heart.
         </div>
-      </div>
-    </footer>
+      </footer>
   );
 }

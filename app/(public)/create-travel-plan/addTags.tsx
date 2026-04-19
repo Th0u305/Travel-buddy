@@ -16,6 +16,10 @@ const AddTags = ({setTags, tags}: {
 
       const isTagExist = tags.includes(value.tags)
       
+      if(value.tags.length < 6){
+        return toast.error("Please enter a tag of at least 6 characters")
+      }
+      
       if(value.tags.length > 22){
         return toast.error("Word limit is 22")
       }

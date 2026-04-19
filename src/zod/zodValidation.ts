@@ -47,7 +47,8 @@ export const formSchema = z
       .min(12,{ message : "Phone number must be at least 12 digits"})
       .refine((value) => !/[a-zA-Z+]/.test(value), {
         message: "Phone number cannot contain letters",
-      })
+    }),
+    country: z.string().min(2, { message: "Country is required" }),
   })
 
 export const loginSchema = z.object({
@@ -108,11 +109,9 @@ export const createPlanSchema = z.object({
   country: z.string().min(2, { message: "Country is required" }),
   city: z.string().min(2, { message: "City is required" }),
   travel_type: z.string().min(2, { message: "Travel type is required" }),
-  start_date: z.string().min(2, { message: "Start date is required" }),
-  end_date: z.string().min(2, { message: "End date is required" }),
-  min_budget: z.number().min(10, { message: "Minimum budget is 10" }),
+  min_budget: z.number().min(100, { message: "Minimum budget is 100" }),
   max_budget: z.number().max(1000000000000, { message: "Maximum budget is too high" }),
-  max_travelers: z.number().min(1, { message: "Maximum travelers is required" }),
+  max_travelers: z.number().min(1, { message: "Maximum buddies is required" }),
   trip_description: z.string().min(2, { message: "Trip description is required" }),
   tags: z.array(z.string()).min(4, { message: "Please add at least 4 tags" }).max(7,{message : "You can only add 7 tags"}),
   looking_for_buddy: z.boolean({message : "Looking for buddy is required"}),

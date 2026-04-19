@@ -1,16 +1,14 @@
-import { Metadata } from "next";
-import AllTrips from "./allTrips";
+import { Metadata } from 'next';
+import ExploreAdventures from './trips';
 
 export const metadata: Metadata = {
-  title: "Travel Buddey | All-Trips",
-  description: "Travel Buddey | All-Trips",
+  title: "Travel Buddey | All trips",
+  description: "Travel Buddey | All trips",
 };
 
 const page = () => {
     return (
-        <>
-            <AllTrips />
-        </>
+      <ExploreAdventures />
     );
 };
 

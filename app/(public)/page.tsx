@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const features = [
   {
@@ -53,26 +54,24 @@ const testimonials = [
     name: "Sarah M.",
     location: "London, UK",
     text: "Found an amazing hiking buddy for my Nepal trek. We've been traveling together ever since!",
-    avatar:
-      `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1775151291/bnzrrzfwqmtyob9rajaa.jpg`,
+    avatar: `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1775151291/bnzrrzfwqmtyob9rajaa.jpg`,
   },
   {
     name: "Carlos R.",
     location: "Barcelona, Spain",
     text: "This platform changed how I travel. Meeting locals and fellow travelers has been incredible.",
-    avatar:
-      `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1775151291/denc8sh8fb3wulmakogd.jpg`,
+    avatar: `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1775151291/denc8sh8fb3wulmakogd.jpg`,
   },
   {
     name: "Aiko T.",
     location: "Tokyo, Japan",
     text: "As a solo female traveler, having verified travel buddies gives me peace of mind.",
-    avatar:
-      `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1775151291/tlt9r9whuszvxhbstewj.jpg`,
+    avatar: `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1775151291/tlt9r9whuszvxhbstewj.jpg`,
   },
 ];
 
 export default function Home() {
+  const router = useRouter()
   return (
     <div>
       {/* Hero Section */}
@@ -114,22 +113,16 @@ export default function Home() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
-              <Button
-                asChild
-                size="lg"
-                className="rounded-xl px-8 h-12 text-base"
-              >
-                <Link href="/find-buddy">
+              <Button size="xl" onClick={() => router.push("/find-buddy")} className="rounded-xl px-8 h-12 text-base">
                   Find a Travel Buddy <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
               </Button>
               <Button
-                asChild
-                size="lg"
+                size="xl"
                 variant="outline"
+                onClick={() => router.push("/explore")}
                 className="rounded-xl px-8 h-12 text-base bg-white/10 border-white/25 text-white hover:bg-white/20 hover:text-white"
               >
-                <Link href="/explore">Explore Travelers</Link>
+                Explore Travelers
               </Button>
             </div>
           </motion.div>
@@ -291,14 +284,12 @@ export default function Home() {
                 </p>
                 <div className="mt-6 flex gap-3">
                   <Button
-                    asChild
                     size="lg"
                     className="rounded-xl bg-white text-primary hover:bg-white/90"
                   >
                     <Link href="/find-buddy">Get Started Free</Link>
                   </Button>
                   <Button
-                    asChild
                     size="lg"
                     variant="outline"
                     className="rounded-xl border-white/30 text-white hover:bg-white/10 hover:text-white"

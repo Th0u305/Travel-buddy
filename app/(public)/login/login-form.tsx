@@ -23,7 +23,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "../../../components/ui/input-group";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, SearchIcon } from "lucide-react";
 import Link from "next/link";
 import {
   useRegister,
@@ -36,6 +36,18 @@ import { useUserStore } from "@/src/store/zustand.store";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { envVars } from "@/src/config/env";
 import { Spinner } from "../../../components/ui/spinner";
+import {
+  Combobox,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopup,
+  ComboboxTrigger,
+  ComboboxValue,
+} from "@/components/ui/combobox";
+import { SelectButton } from "@/components/ui/select";
+import { useGetCountries } from "@/src/tanstack/useQuery";
 
 export default function LoginForm() {
   const [showPass, setShowPass] = useState<boolean>(false);
@@ -48,6 +60,8 @@ export default function LoginForm() {
   const [token, setToken] = useState<string | null>(null);
   const captchaRef = useRef<HCaptcha>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [searchCountry, setSearchCountry] = useState<string>("");
+  const { countries } = useGetCountries(searchCountry);
 
   const loginOrSignUp = () => {
     setIsSignUp(isSignUp === "Sign Up" ? "Login" : "Sign Up");
@@ -62,6 +76,7 @@ export default function LoginForm() {
       password: "",
       name: "",
       phone_number: "",
+      country: "",
       confirm_password: "",
     },
 
@@ -87,10 +102,8 @@ export default function LoginForm() {
 
         setIsLoading(true);
         registerMutate(value);
-        setTimeout(() => {
-          setIsLoading(false);
-          form.reset();
-        }, 2000);
+        setIsLoading(false);
+        form.reset();
       }
       if (isSignUp === "Login") {
         if (!validateLogin.success) {
@@ -101,26 +114,25 @@ export default function LoginForm() {
           return;
         }
 
-        if (!token) return toast.error("Please verify you are not a robot");
+        // if (!token) return toast.error("Please verify you are not a robot");
 
         setIsLoading(true);
         loginMutate(value);
-        setTimeout(() => {
-          setIsLoading(false);
-          form.reset();
-        }, 2000);
+        setIsLoading(false);
+        form.reset();
       }
     },
   });
 
   const googleLoginFn = () => {
-    if(user?.data?.email && user?.data?.full_name) return toast.error("You are already logged in")
-    googleLoginMutate()
-  }
+    if (user?.data?.email && user?.data?.full_name)
+      return toast.error("You are already logged in");
+    googleLoginMutate();
+  };
 
   return (
-    <div className="">
-      <Card className="mb-6">
+    <div>
+      <Card className="mb-6 w-auto">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>
@@ -142,6 +154,7 @@ export default function LoginForm() {
                   variant="outline"
                   type="button"
                   className="cursor-pointer"
+                  size="lg"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
@@ -155,6 +168,7 @@ export default function LoginForm() {
                   variant="outline"
                   type="button"
                   className="cursor-pointer"
+                  size="lg"
                   onClick={() => googleLoginFn()}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -168,11 +182,13 @@ export default function LoginForm() {
               </Field>
 
               {/* Separator */}
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
+              <FieldSeparator
+                className={`*:data-[slot=field-separator-content]:bg-card ${isSignUp === "Sign Up" ? "md:col-span-2" : ""}`}
+              >
                 Or continue with
               </FieldSeparator>
 
-              {/* Sign Up Fields */}
+              {/* Sign Up Fields & country */}
               {isSignUp === "Sign Up" && (
                 <>
                   {/* Name Field */}
@@ -189,6 +205,7 @@ export default function LoginForm() {
                               onBlur={field.handleBlur}
                               type="text"
                               placeholder="Enter your name"
+                              className="h-10"
                               onChange={(e) =>
                                 field.handleChange(e.target.value)
                               }
@@ -214,12 +231,69 @@ export default function LoginForm() {
                               onBlur={field.handleBlur}
                               type="number"
                               placeholder="Enter your phone number"
+                              className="h-10"
                               onChange={(e) =>
                                 field.handleChange(e.target.value)
                               }
                               required
                             />
                           </>
+                        );
+                      }}
+                    </form.Field>
+                  </Field>
+
+                  {/* Country Field */}
+                  <Field>
+                    <FieldLabel htmlFor="country">Country</FieldLabel>
+                    <form.Field name="country">
+                      {(field) => {
+                        return (
+                          <Combobox
+                            items={countries}
+                            onValueChange={(e) => {
+                              field.handleChange(e as string);
+                            }}
+                            value={field.state.value}
+                          >
+                            <ComboboxTrigger
+                              className="h-10"
+                              render={<SelectButton />}
+                            >
+                              <ComboboxValue placeholder="Select a country" />
+                            </ComboboxTrigger>
+                            <ComboboxPopup
+                              aria-label="Select a country"
+                              className="w-1/2"
+                            >
+                              <div className="border-b p-2">
+                                <ComboboxInput
+                                  className="rounded-md before:rounded-[calc(var(--radius-md)-1px)] pl-8"
+                                  placeholder="Search countries..."
+                                  showTrigger={false}
+                                  startAddon={<SearchIcon />}
+                                  onChange={(e) =>
+                                    setSearchCountry(e.target.value)
+                                  }
+                                />
+                              </div>
+                              <ComboboxEmpty>No countries found.</ComboboxEmpty>
+                              <ComboboxList>
+                                {countries?.length > 0 ? (
+                                  (item) => (
+                                    <ComboboxItem
+                                      key={item.iso2}
+                                      value={item.name}
+                                    >
+                                      {item.name}
+                                    </ComboboxItem>
+                                  )
+                                ) : (
+                                  <Spinner className="w-8 h-8 text-blue-500" />
+                                )}
+                              </ComboboxList>
+                            </ComboboxPopup>
+                          </Combobox>
                         );
                       }}
                     </form.Field>
@@ -241,6 +315,7 @@ export default function LoginForm() {
                           onBlur={field.handleBlur}
                           type="email"
                           placeholder="Enter your email"
+                          className="h-10"
                           onChange={(e) => field.handleChange(e.target.value)}
                           required
                         />
@@ -254,18 +329,12 @@ export default function LoginForm() {
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Link
-                    href="/reset-password"
-                    className="ml-auto text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
                 </div>
                 <form.Field name="password">
                   {(field) => {
                     return (
                       <>
-                        <InputGroup>
+                        <InputGroup className="h-10">
                           <InputGroupInput
                             id={field.name}
                             name={field.name}
@@ -274,6 +343,7 @@ export default function LoginForm() {
                             type={showPass ? "text" : "password"}
                             onChange={(e) => field.handleChange(e.target.value)}
                             placeholder="Enter password"
+                            className="h-10"
                             required
                           />
                           <InputGroupAddon
@@ -301,18 +371,12 @@ export default function LoginForm() {
                 <Field>
                   <div className="flex items-center">
                     <FieldLabel htmlFor="password">Confirm Password</FieldLabel>
-                    <Link
-                      href="/reset-password"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot your password?
-                    </Link>
                   </div>
                   <form.Field name="confirm_password">
                     {(field) => {
                       return (
                         <>
-                          <InputGroup>
+                          <InputGroup className="h-10">
                             <InputGroupInput
                               id={field.name}
                               name={field.name}
@@ -351,6 +415,14 @@ export default function LoginForm() {
                   </form.Field>
                 </Field>
               )}
+              <div className="w-fit mx-auto">
+                <Link
+                  href="/reset-password"
+                  className="text-sm underline-offset-4 underline"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
 
               {/* hcaptcha */}
               <HCaptcha
@@ -359,12 +431,12 @@ export default function LoginForm() {
                 ref={captchaRef}
               />
 
-              <Field>
-                <Button type="submit" className="cursor-pointer">
+              <Field className={isSignUp === "Sign Up" ? "md:col-span-2" : ""}>
+                <Button size="lg" type="submit" className="cursor-pointer">
                   {isLoading ? <Spinner /> : isSignUp}
                 </Button>
                 <FieldDescription className="text-center">
-                  Already have an account?{" "}
+                  Already have an account?
                   <Link href="#" onClick={() => loginOrSignUp()}>
                     {isSignUp === "Sign Up" ? "Login" : "Sign Up"}
                   </Link>

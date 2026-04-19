@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 import Footer from "../../components/layout/Footer";
 import Navbar from "../../components/layout/Navbar";
+import { useGetUserProfile } from "@/src/tanstack/useQuery";
+import Loading from "@/components/loading";
 import { useUserStore } from "@/src/store/zustand.store";
-import {useGetUserProfile} from "@/src/tanstack/useQuery";
 
 export default function PublicLayout({
   children,
@@ -12,13 +13,20 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   const { userProfileRefetch } = useGetUserProfile();
-  const { userData, setHasHydrated } = useUserStore();
+  const hasHydrated = useUserStore((state) => state.hasHydrated);
 
   useEffect(() => {
-    if (!userData) {
-      userProfileRefetch();
-    }
-  }, [userData, userProfileRefetch, setHasHydrated]);
+    userProfileRefetch()
+  },[userProfileRefetch]);
+
+  if (!hasHydrated) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-[#212121]">
+        <Loading />
+      </div>
+    );
+  }
+
   return (
     <>
       <Navbar />

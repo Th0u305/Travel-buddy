@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-muted mt-10">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-muted pt-30 p-5">
       <div className="flex w-full max-w-sm flex-col gap-6">
         <Link
           href="/"

@@ -115,9 +115,9 @@ export default function FileUploader({
             <Button
               type="button"
               onClick={()=> previewImage()}
-              className="cursor-pointer bg-white text-on-surface h-15 px-6 py-3 rounded-lg font-bold active:scale-95 transition-all"
+              className="hover:bg-secondary border-0 h-15 cursor-pointer bg-white text-on-surface px-6 py-3 rounded-lg font-bold active:scale-95 transition-all"
             >
-              Preview
+              Upload
             </Button>
           </>
         )}
@@ -141,7 +141,7 @@ export default function FileUploader({
           {files.map((fileObj) => (
             <div
               key={fileObj.id}
-              className="flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm"
+              className="flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm mt-2"
             >
               <div className="flex items-center space-x-4">
                 {/* Show Image Preview if it exists */}
@@ -184,7 +184,7 @@ export default function FileUploader({
                   setImage(originalImage)
                   setImageFile(null)
                 }}
-                className="text-sm text-red-500 hover:text-red-700"
+                className="text-sm text-red-500 hover:text-red-700 cursor-pointer"
               >
                 Remove
               </button>

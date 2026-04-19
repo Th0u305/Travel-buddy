@@ -3,28 +3,27 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import axios from "axios";
-import { useUserStore } from "../store/zustand.store";
+// import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
+// import { PersistQueryClientProvider, removeOldestQuery } from '@tanstack/react-query-persist-client';
+// import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function TanProviders({
   children,
 }: {
   children: React.ReactNode;
 }) {
-const hasHydrated = useUserStore((state) => state.hasHydrated);
+
+  // const localStoragePersister = createAsyncStoragePersister({
+  //   storage: AsyncStorage,
+  //   retry : removeOldestQuery
+  // });
 
 
-if (!hasHydrated) {
-    // Return a blank screen, or a nice full-screen loading spinner
-    return (
-      <div className="flex h-screen w-screen items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
-
-  const queryClient = new QueryClient({    
+  const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
+        staleTime : 1000 * 6,
+        gcTime : 1000 * 6,
         retry(failureCount, error) {
           if (failureCount > 2) {
             error.message = "Server seems down please try again later";
@@ -44,7 +43,20 @@ if (!hasHydrated) {
     },
   });
 
+
+
   return (
+    // <PersistQueryClientProvider client={queryClient} persistOptions={{ persister: localStoragePersister , dehydrateOptions : {
+    //   shouldDehydrateQuery(query) {
+    //     if (query.queryKey[0] === "travelLists" || query.queryKey[0] === "travelBuddies") {
+    //       return false;
+    //     }
+    //     return true;
+    //   },
+    // }}}>
+    //   {children}
+    //   <ReactQueryDevtools initialIsOpen={false} />
+    // </PersistQueryClientProvider>
     <QueryClientProvider client={queryClient}>
       {children}
       <ReactQueryDevtools initialIsOpen={false} />

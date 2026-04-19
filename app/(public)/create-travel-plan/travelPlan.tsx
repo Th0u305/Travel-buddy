@@ -13,7 +13,14 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "@tanstack/react-form";
-import { CalendarIcon, Compass, Edit, Map, Users, XCircleIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  Compass,
+  Edit,
+  Map,
+  Users,
+  XCircleIcon,
+} from "lucide-react";
 import Image from "next/image";
 import { startTransition, useOptimistic, useState } from "react";
 import { toast } from "sonner";
@@ -29,8 +36,6 @@ import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
 
-
-
 export default function TravelPlan() {
   const originalImage = `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1775166873/cxvbxkhrmc3507c7ubba.avif`;
   const [image, setImage] = useState<string>(originalImage);
@@ -41,7 +46,9 @@ export default function TravelPlan() {
     useOptimistic<File | null>(imageFile);
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(["Photography", "Adventure"]);
+  const [maxBuddy, setMaxBuddy] = useState<number>(1);
+  const [travelType, setTravelType] = useState<string>("");
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -58,8 +65,6 @@ export default function TravelPlan() {
       country: "",
       city: "",
       travel_type: "solo",
-      start_date: "",
-      end_date: "",
       min_budget: "",
       max_budget: "",
       max_travelers: "",
@@ -69,13 +74,21 @@ export default function TravelPlan() {
     },
 
     onSubmit: async ({ value }) => {
-
-      const startDate = date?.from ? new Date(date.from).toISOString().split('T')[0] : '';
-      const endDate = date?.to ? new Date(date.to).toISOString().split('T')[0] : '';
+      const startDate = date?.from ? format(date.from, "yyyy-MM-dd") : "";
+      const endDate = date?.to ? format(date.to, "yyyy-MM-dd") : "";
       const isImage = optimisticImage.startsWith("blob:");
+      const today = new Date().toISOString().split("T")[0];
 
-      if(startDate === endDate){
-        return toast.error("Start date and end date cannot be same")
+      if (!startDate || !endDate) {
+        return toast.error("Please select start and end dates");
+      }
+
+      if (startDate < today) {
+        return toast.error("Please select a valid start date");
+      }
+
+      if (startDate === endDate) {
+        return toast.error("Start date and end date cannot be same");
       }
 
       if (
@@ -95,10 +108,12 @@ export default function TravelPlan() {
         ...value,
         min_budget: Number(value.min_budget),
         max_budget: Number(value.max_budget),
-        max_travelers: Number(value.max_travelers),
+        max_travelers: maxBuddy,
         tags: tags,
         looking_for_buddy: isChecked,
         status: "active",
+        start_date: startDate,
+        end_date: endDate,
       };
 
       const validate = createPlanSchema.safeParse(modifiedData);
@@ -120,7 +135,6 @@ export default function TravelPlan() {
       }
       try {
         setIsLoading(true);
-        toast.loading("Creating your travel plan...");
 
         const response = await fetch(
           `https://api.cloudinary.com/v1_1/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload`,
@@ -133,6 +147,7 @@ export default function TravelPlan() {
         const data = await response.json();
 
         if (!response.ok) {
+          toast.dismiss()
           return toast.error("Failed to upload image. Please try again later.");
         }
         startTransition(() => {
@@ -147,10 +162,9 @@ export default function TravelPlan() {
 
         createTravelPlan(modifiedData2);
         setIsLoading(false);
-        toast.success("Travel plan created successfully");
-        toast.dismiss();
-        setTags([]);
+        setTags(["Photography", "Adventure"]);
         form.reset();
+        setDate(undefined);
         startTransition(() => {
           mutateOptimisticImageFile(null);
           mutateOptimisticImage(originalImage);
@@ -169,35 +183,9 @@ export default function TravelPlan() {
 
   return (
     <div className="text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col">
-      {/* Top Navigation Shell */}
-
-      {/* <nav className="fixed top-0 w-full z-50 bg-[#fafaf5]/80 backdrop-blur-xl shadow-sm">
-        <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
-          <div className="text-2xl font-black tracking-tight text-[#30332e]">Modern Explorer</div>
-          <div className="hidden md:flex items-center gap-6">
-            <a href="#" className="font-headline font-bold text-lg text-[#5c605a] hover:text-[#30332e] transition-colors duration-200">Explore</a>
-            <a href="#" className="font-headline font-bold text-lg text-[#5c605a] hover:text-[#30332e] transition-colors duration-200">Community</a>
-            <a href="#" className="font-headline font-bold text-lg text-[#a33f00] border-b-2 border-[#a33f00] pb-1">Journal</a>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="p-2 rounded-full hover:bg-[#f3f4ee]/50 active:scale-95 transition-all">
-              <span className="material-symbols-outlined text-[#a33f00]">notifications</span>
-            </button>
-
-            avater image
-  
-          </div>
-        </div>
-      </nav> */}
-
       <main className="pt-24 pb-20 px-4 md:px-8 max-w-5xl mx-auto grow w-full">
         {/* Hero Header */}
         <header className="mb-12">
-          {/* <nav className="flex items-center gap-2 mb-4 text-on-surface-variant font-label text-sm uppercase tracking-widest">
-            <span>Journal</span>
-            <span className="material-symbols-outlined text-xs">chevron_right</span>
-            <span className="text-primary font-bold">New Adventure</span>
-          </nav> */}
           <h1 className="font-headline font-black text-5xl md:text-6xl tracking-tight text-on-surface">
             Map Your <span className="text-primary">Next Path</span>
           </h1>
@@ -230,7 +218,6 @@ export default function TravelPlan() {
               </label>
 
               {/* file uploader */}
-
               <FileUploader
                 profile_image={false}
                 setImageFile={setImageFile}
@@ -265,6 +252,7 @@ export default function TravelPlan() {
                       Trip Title
                     </label>
 
+                    {/* trip title */}
                     <form.Field name="trip_title">
                       {(field) => {
                         return (
@@ -287,7 +275,10 @@ export default function TravelPlan() {
                       }}
                     </form.Field>
                   </div>
+
+                  {/* country and city */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* country */}
                     <div className="flex flex-col gap-2">
                       <label className="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider">
                         Country
@@ -315,6 +306,8 @@ export default function TravelPlan() {
                         }}
                       </form.Field>
                     </div>
+
+                    {/* city */}
                     <div className="flex flex-col gap-2">
                       <label className="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider">
                         City
@@ -355,6 +348,7 @@ export default function TravelPlan() {
                   </h2>
                 </div>
                 <div className="space-y-6">
+                  {/* travel type */}
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider">
                       Travel Type
@@ -362,28 +356,39 @@ export default function TravelPlan() {
 
                     <form.Field name="travel_type">
                       {(field) => {
+                        const handleTypeChange = (value: string) => {
+                          if (!value) return;
+                          field.handleChange(value);
+
+                          // Map travel type → max travelers
+                          const travelerMap: Record<string, string> = {
+                            solo: "1",
+                            couple: "2",
+                            group: "3", // Adjust as needed
+                          };
+                          const newMax =
+                            travelerMap[value.toLowerCase()] || "1";
+
+                          // Update Field 1's form state directly (triggers UI re-render)
+                          form.setFieldValue("max_travelers", newMax);
+                          setIsChecked(Number(newMax) > 1);
+                          setMaxBuddy(Number(newMax));
+                          setTravelType(value);
+                        };
                         return (
                           <ToggleGroup
-                            defaultValue={["solo"]}
-                            onValueChange={(value) => {
-                              field.handleChange(value[0]);
-                            }}
+                            value={[travelType]}
+                            onValueChange={(value) =>
+                              handleTypeChange(value[0])
+                            }
                             size="lg"
                             className="flex-wrap gap-2"
                           >
-                            <ToggleGroupItem value="solo">Solo</ToggleGroupItem>
-
-                            <ToggleGroupItem value="couple">
-                              Couple
-                            </ToggleGroupItem>
-
-                            <ToggleGroupItem value="family">
-                              Family
-                            </ToggleGroupItem>
-
-                            <ToggleGroupItem value="group">
-                              Group
-                            </ToggleGroupItem>
+                            {["Solo", "Couple", "Group"].map((n) => (
+                              <ToggleGroupItem key={n} value={n.toString()}>
+                                {n}
+                              </ToggleGroupItem>
+                            ))}
                           </ToggleGroup>
                         );
                       }}
@@ -391,7 +396,6 @@ export default function TravelPlan() {
                   </div>
 
                   {/* trip inserted */}
-
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider">
                       Trip Interests
@@ -422,6 +426,7 @@ export default function TravelPlan() {
                 {/* add tags */}
                 <AddTags setTags={setTags} tags={tags} />
 
+                {/* description */}
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider">
                     Description
@@ -467,240 +472,191 @@ export default function TravelPlan() {
                   </h2>
                 </div>
 
-   <Popover>
-      <PopoverTrigger
-        render={<Button className="w-full justify-start" variant="outline" />}
-      >
-        <CalendarIcon aria-hidden="true" />
-        {date?.from ? (
-          date.to ? (
-            <>
-              {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
-            </>
-          ) : (
-            format(date.from, "LLL dd, y")
-          )
-        ) : (
-          <span>Pick a date range</span>
-        )}
-      </PopoverTrigger>
-      <PopoverPopup>
-        <Calendar
-          defaultMonth={date?.from}
-          mode="range"
-          onSelect={setDate}
-          selected={date}
-        />
-      </PopoverPopup>
-    </Popover>
+                {/* date picker */}
+                <Popover>
+                  <PopoverTrigger
+                    render={
+                      <Button
+                        className="w-full justify-start h-12 hover:bg-primary/20"
+                        variant="outline"
+                      />
+                    }
+                  >
+                    <CalendarIcon aria-hidden="true" />
+                    {date?.from ? (
+                      date.to ? (
+                        <>
+                          {format(date.from, "LLL dd, y")} -{" "}
+                          {format(date.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(date.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Pick a date range</span>
+                    )}
+                  </PopoverTrigger>
+                  <PopoverPopup>
+                    <Calendar
+                      defaultMonth={date?.from}
+                      mode="range"
+                      onSelect={setDate}
+                      selected={date}
+                    />
+                  </PopoverPopup>
+                </Popover>
 
-
-                <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-label font-bold text-on-surface-variant uppercase">
-                        Start Date
-                      </label>
-
-                      <form.Field name="start_date">
-                        {(field) => {
-                          return (
-                            <>
-                              <Input
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                type="date"
-                                placeholder="e.g., Andean Highlands Expedition"
-                                onChange={(e) =>
-                                  field.handleChange(e.target.value)
-                                }
-                                required
-                                className="bg-white h-10 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 transition-all text-lg font-medium"
-                              />
-                            </>
-                          );
-                        }}
-                      </form.Field>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-label font-bold text-on-surface-variant uppercase">
-                        End Date
-                      </label>
-
-                      <form.Field name="end_date">
-                        {(field) => {
-                          return (
-                            <>
-                              <Input
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                type="date"
-                                placeholder="e.g., Andean Highlands Expedition"
-                                onChange={(e) =>
-                                  field.handleChange(e.target.value)
-                                }
-                                required
-                                className="bg-white h-10 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 transition-all text-lg font-medium"
-                              />
-                            </>
-                          );
-                        }}
-                      </form.Field>
-                    </div>
-                  </div>
-                  <div className="pt-4 border-t border-outline-variant/20">
-                    <label className="text-xs font-label font-bold text-on-surface-variant uppercase mb-3 block">
-                      Estimated Budget (USD)
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <form.Field name="min_budget">
-                        {(field) => {
-                          return (
-                            <>
-                              <Input
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                type="number"
-                                placeholder="Min"
-                                onChange={(e) =>
-                                  field.handleChange(e.target.value)
-                                }
-                                required
-                                className="bg-white h-10 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 transition-all text-lg font-medium"
-                              />
-                            </>
-                          );
-                        }}
-                      </form.Field>
-
-                      <span className="text-outline-variant">—</span>
-
-                      <form.Field name="max_budget">
-                        {(field) => {
-                          return (
-                            <>
-                              <Input
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                type="number"
-                                placeholder="Max"
-                                onChange={(e) =>
-                                  field.handleChange(e.target.value)
-                                }
-                                required
-                                className="bg-white h-10 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 transition-all text-lg font-medium"
-                              />
-                            </>
-                          );
-                        }}
-                      </form.Field>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Buddy Search (Glassmorphism Concept) */}
-              <div className="bg-secondary-container/30 p-5 rounded-2xl bg-[#e9f8ee] border border-secondary-container relative overflow-hidden">
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <Users className="mr-2" />
-                      <h2 className="font-headline font-bold text-xl text-on-secondary-fixed">
-                        Buddy Search
-                      </h2>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <form.Field name="looking_for_buddy">
-                        {(field) => {
-                          return (
-                            <Switch
+                {/* budget */}
+                <div className="pt-4 border-t border-outline-variant/20">
+                  <label className="text-xs font-label font-bold text-on-surface-variant uppercase mb-3 block">
+                    Estimated Budget (USD)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <form.Field name="min_budget">
+                      {(field) => {
+                        return (
+                          <>
+                            <Input
                               id={field.name}
                               name={field.name}
                               value={field.state.value}
                               onBlur={field.handleBlur}
-                              checked={isChecked}
-                              className="data-unchecked:bg-red-400"
+                              type="number"
+                              placeholder="Min"
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                              required
+                              className="bg-white h-10 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 transition-all text-lg font-medium"
                             />
-                          );
-                        }}
-                      </form.Field>
-                    </label>
+                          </>
+                        );
+                      }}
+                    </form.Field>
+
+                    <span className="text-outline-variant">—</span>
+
+                    <form.Field name="max_budget">
+                      {(field) => {
+                        return (
+                          <>
+                            <Input
+                              id={field.name}
+                              name={field.name}
+                              value={field.state.value}
+                              onBlur={field.handleBlur}
+                              type="number"
+                              placeholder="Max"
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                              required
+                              className="bg-white h-10 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 transition-all text-lg font-medium"
+                            />
+                          </>
+                        );
+                      }}
+                    </form.Field>
+                  </div>
+                </div>
+              </div>
+
+              {/* Buddy Search */}
+              <div className="bg-secondary-container/30 p-5 rounded-2xl bg-[#e9f8ee] border border-secondary-container">
+                {/* looking for buddy */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <Users className="mr-2" />
+                    <h2 className="font-headline font-bold text-xl text-on-secondary-fixed">
+                      Buddy Search
+                    </h2>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <form.Field name="looking_for_buddy">
+                      {(field) => {
+                        return (
+                          <Switch
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            checked={isChecked}
+                            className="data-unchecked:bg-red-400"
+                          />
+                        );
+                      }}
+                    </form.Field>
+                  </label>
+                </div>
+
+                {/* max buddies needed */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center text-sm font-medium">
+                    <span className="text-on-secondary-fixed-variant">
+                      Max Buddies Needed
+                    </span>
+
+                    <form.Field name="max_travelers">
+                      {(field) => {
+                        const handleTypeChange = (value: string) => {
+                          if (!value) return;
+                          field.handleChange(value);
+
+                          if (Number(value) === 1) {
+                            setTravelType("Solo");
+                          } else if (Number(value) === 2) {
+                            setTravelType("Couple");
+                          } else {
+                            setTravelType("Group");
+                          }
+                          setIsChecked(Number(value) > 2 ? true : false);
+                          setMaxBuddy(Number(value));
+                        };
+                        return (
+                          <Select
+                            value={field?.state?.value.toString()}
+                            onValueChange={(e) => handleTypeChange(e as string)}
+                          >
+                            <SelectTrigger className="border-none rounded-lg text-sm focus:ring-secondary/20 bg-white w-15">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                                  <SelectItem key={n} value={n.toString()}>
+                                    {n}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        );
+                      }}
+                    </form.Field>
                   </div>
 
-                  {/* max buddies needed */}
-
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center text-sm font-medium">
-                      <span className="text-on-secondary-fixed-variant">
-                        Max Buddies Needed
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-label font-bold text-on-secondary-fixed-variant uppercase">
+                      Current Status
+                    </label>
+                    <div className="flex gap-2">
+                      <span className="bg-primary text-on-primary px-3 py-1 rounded-full text-xs font-black">
+                        Highly Interested
                       </span>
-
-                      <form.Field name="max_travelers">
-                        {(field) => {
-                          return (
-                            <Select
-                              onValueChange={(e) => {
-                                field.handleChange(e as string);
-                                setIsChecked(Number(e) > 1 ? true : false);
-                              }}
-                              value={field.state.value}
-                            >
-                              <SelectTrigger className="border-none rounded-lg text-sm focus:ring-secondary/20 bg-white w-15">
-                                <SelectValue placeholder="1" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectItem value="1">1</SelectItem>
-                                  <SelectItem value="2">2</SelectItem>
-                                  <SelectItem value="3">3</SelectItem>
-                                  <SelectItem value="4">4</SelectItem>
-                                  <SelectItem value="5">5</SelectItem>
-                                  <SelectItem value="6">6</SelectItem>
-                                  <SelectItem value="7">7</SelectItem>
-                                  <SelectItem value="8">8</SelectItem>
-                                  <SelectItem value="9">9</SelectItem>
-                                  <SelectItem value="10">10</SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                          );
-                        }}
-                      </form.Field>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-label font-bold text-on-secondary-fixed-variant uppercase">
-                        Current Status
-                      </label>
-                      <div className="flex gap-2">
-                        <span className="bg-primary text-on-primary px-3 py-1 rounded-full text-xs font-black">
-                          Highly Interested
-                        </span>
-                        <span className="bg-white/50 text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold">
-                          Exploring
-                        </span>
-                      </div>
+                      <span className="bg-white/50 text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold">
+                        Exploring
+                      </span>
                     </div>
                   </div>
                 </div>
-                {/* Abstract Organic Shape Background */}
-                <div className="absolute -top-12 -right-12 w-32 h-32 bg-secondary/10 rounded-full blur-3xl"></div>
               </div>
 
               {/* Actions */}
               <div className="flex flex-col gap-4">
                 <Button
                   type="submit"
-                  size="lg"
-                  className="cursor-pointer bg-secondary text-white h-15 py-5 rounded-full font-headline font-bold text-lg shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                  size="xl"
+                  className="border-none cursor-pointer bg-secondary text-white py-5 rounded-full font-headline font-bold text-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                 >
                   {!isLoading && <Map />}
                   {isLoading ? (
@@ -711,7 +667,7 @@ export default function TravelPlan() {
                 </Button>
                 <Button
                   type="button"
-                  size="lg"
+                  size="xl"
                   onClick={() => {
                     form.reset();
                     startTransition(() => {
@@ -722,7 +678,7 @@ export default function TravelPlan() {
                     setImageFile(null);
                     setImage(originalImage);
                   }}
-                  className="cursor-pointer bg-[#dfe4dd] text-on-surface-variant h-15 py-4 rounded-full font-headline font-bold hover:bg-surface-container transition-all active:scale-95"
+                  className="border-none cursor-pointer bg-[#dfe4dd] text-on-surface-variant py-4 rounded-full font-headline font-bold hover:bg-surface-container transition-all active:scale-95"
                 >
                   Cancel
                 </Button>
@@ -731,21 +687,6 @@ export default function TravelPlan() {
           </div>
         </div>
       </main>
-      {/* Footer */}
-      {/* <footer className="bg-[#f3f4ee] w-full mt-auto border-t-0">
-        <div className="flex flex-col md:flex-row justify-between items-center px-8 py-12 gap-4 w-full max-w-7xl mx-auto">
-          <div className="flex flex-col gap-2">
-            <span className="text-lg font-bold text-[#30332e]">Modern Explorer</span>
-            <p className="font-['Manrope'] text-sm tracking-wide text-[#5c605a]">© 2024 The Modern Explorer. Built for the tactile traveler.</p>
-          </div>
-          <div className="flex gap-6">
-            <a href="#" className="text-[#5c605a] hover:text-[#a33f00] transition-colors font-['Manrope'] text-sm tracking-wide">Privacy</a>
-            <a href="#" className="text-[#5c605a] hover:text-[#a33f00] transition-colors font-['Manrope'] text-sm tracking-wide">Terms</a>
-            <a href="#" className="text-[#5c605a] hover:text-[#a33f00] transition-colors font-['Manrope'] text-sm tracking-wide">Support</a>
-            <a href="#" className="text-[#5c605a] hover:text-[#a33f00] transition-colors font-['Manrope'] text-sm tracking-wide">Contact</a>
-          </div>
-        </div>
-      </footer> */}
     </div>
   );
 }
