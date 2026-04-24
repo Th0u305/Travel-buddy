@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useFileUpload, formatBytes } from "@/src/hooks/use-upload";
-import { Input } from "../../components/ui/input";
-import { Button } from "../../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
 import { startTransition, useEffect } from "react";
 import { toast } from "sonner";
 import { envVars } from "../config/env";
@@ -13,7 +13,7 @@ export default function FileUploader({
   mutateOptimisticImage,
   mutateOptimisticImageFile,
   resetForm,
-  setResetForm
+  setResetForm,
 }: {
   profile_image: boolean;
   setImageFile: (value: File | null) => void;
@@ -30,7 +30,7 @@ export default function FileUploader({
       handleDragLeave,
       handleDragOver,
       handleDrop,
-      // openFileDialog,
+      openFileDialog,
       removeFile,
       getInputProps,
     },
@@ -39,38 +39,37 @@ export default function FileUploader({
     accept: "image/*",
     multiple: false, // Allow multiple files
     maxFiles: 1,
-    maxSize: 5 * 1024 * 1024, // 5MB max size
+    maxSize: 5 * 1024 * 1024 * 100, // 5MB max size
     onFilesAdded: async (addedFiles) => {
-      setResetForm(false)
-      startTransition(()=>{
-        mutateOptimisticImageFile(addedFiles[0]?.file as File)
-      })
+      setResetForm(false);
+      startTransition(() => {
+        mutateOptimisticImageFile(addedFiles[0]?.file as File);
+      });
       setImageFile(addedFiles[0]?.file as File);
-    }
-  })
+    },
+  });
 
-  const originalImage = `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1775166873/cxvbxkhrmc3507c7ubba.avif`
+  const originalImage = `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1775166873/cxvbxkhrmc3507c7ubba.avif`;
 
-  const previewImage = () =>{
-    setResetForm(false)
-    const file = files[0]?.preview
-    if(file){
-      setImage(file)
-      startTransition(()=>{
-        mutateOptimisticImage(file)
-      })
+  const previewImage = () => {
+    setResetForm(false);
+    const file = files[0]?.preview;
+    if (file) {
+      setImage(file);
+      startTransition(() => {
+        mutateOptimisticImage(file);
+      });
+    } else {
+      toast.error("Error previewing image");
     }
-    else{
-      toast.error("Error previewing image")
-    }
-  }
+  };
 
-  useEffect(()=>{
-    if(resetForm){
-      removeFile(files[0]?.id)
+  useEffect(() => {
+    if (resetForm) {
+      removeFile(files[0]?.id);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[resetForm])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetForm]);
 
   return (
     <div className="">
@@ -92,7 +91,7 @@ export default function FileUploader({
       >
         {profile_image ? (
           <>
-            <div className="text-center">
+            <div className="text-center" onClick={openFileDialog}>
               <p className="text-lg font-semibold text-gray-700">
                 {isDragging ? "Drop files here!" : "Click or drag files here"}
               </p>
@@ -114,7 +113,7 @@ export default function FileUploader({
             />
             <Button
               type="button"
-              onClick={()=> previewImage()}
+              onClick={() => previewImage()}
               className="hover:bg-secondary border-0 h-15 cursor-pointer bg-white text-on-surface px-6 py-3 rounded-lg font-bold active:scale-95 transition-all"
             >
               Upload
@@ -176,13 +175,13 @@ export default function FileUploader({
               {/* Remove Button */}
               <button
                 onClick={() => {
-                  removeFile(fileObj.id)
-                  startTransition(()=>{
-                    mutateOptimisticImage(originalImage)
-                    mutateOptimisticImageFile(null)
-                  })
-                  setImage(originalImage)
-                  setImageFile(null)
+                  removeFile(fileObj.id);
+                  startTransition(() => {
+                    mutateOptimisticImage(originalImage);
+                    mutateOptimisticImageFile(null);
+                  });
+                  setImage(originalImage);
+                  setImageFile(null);
                 }}
                 className="text-sm text-red-500 hover:text-red-700 cursor-pointer"
               >

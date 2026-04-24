@@ -10,7 +10,6 @@ export interface FullUserProfile {
     is_admin: boolean;
     is_premium: boolean;
     is_verified: boolean;
-    profile_picture: string | null;
     stripe_customer_id: string | null;
     subscription_expires_at: string | null;
     subscription_tier: string | null;
@@ -61,10 +60,10 @@ export interface TravelListTs {
   participantsId : string[];
 }
 export interface SmallProfile {
+  id: string;
   email: string;
   full_name: string;
   avatar_url: string;
-  profile_picture: string;
   username_slug: string | null;
 }
 export interface SmallProfileZustand {

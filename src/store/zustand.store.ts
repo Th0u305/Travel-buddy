@@ -20,8 +20,8 @@ interface UserStore {
   travelBuddies : TravelBuddiesTs[]
   setTravelBuddies: (travelBuddies: TravelListTs[]) => void,
 
-  fullUserProfile : FullUserProfile | null
-  setFullUserProfile: (fullUserProfile: FullUserProfile) => void,
+  viewUserProfile : FullUserProfile | null
+  setViewUserProfile: (viewUserProfile: FullUserProfile) => void,
 }
 
 // export const useUserStore = create<UserStore>()((set) => ({
@@ -65,8 +65,8 @@ export const useUserStore = create<UserStore>()(
       travelBuddies : [],
       setTravelBuddies: (travelBuddies: TravelBuddiesTs[]) => set({ travelBuddies }),
 
-      fullUserProfile : null,
-      setFullUserProfile: (fullUserProfile: FullUserProfile) => set({ fullUserProfile }),
+      viewUserProfile : null,
+      setViewUserProfile: (viewUserProfile: FullUserProfile) => set({ viewUserProfile }),
     }),
     {
       name: "hello-world",
