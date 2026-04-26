@@ -22,25 +22,13 @@ interface UserStore {
 
   viewUserProfile : FullUserProfile | null
   setViewUserProfile: (viewUserProfile: FullUserProfile) => void,
+
+  userFullProfile : FullUserProfile | null
+  setUserFullProfile: (userFullProfile: FullUserProfile) => void,
+
+  updateError : boolean
+  setUpdateError: (updateError: boolean) => void,
 }
-
-// export const useUserStore = create<UserStore>()((set) => ({
-//   isLoggedIn : false,
-//   userData: {} as UserTs,
-//   setUserData: (userData: UserTs) => set({ userData, isLoggedIn: true }),
-//   removeUserData: () => set({ userData: {} as UserTs, isLoggedIn: false }),
-//   setIsLoggedIn: (state: boolean) => set({ isLoggedIn: state }),
-//   hasHydrated : false,
-//   setHasHydrated: (state: boolean) => set({ hasHydrated: state }),
-//   travelLists : [],
-//   setTravelLists: (travelLists: TravelListTs[]) => set({ travelLists }),
-
-//   singleTravelList : null,
-//   setSingleTravelList: (singleTravelList: TravelListTs) => set({ singleTravelList }),
-
-//   travelBuddies : [],
-//   setTravelBuddies: (travelBuddies: TravelListTs[]) => set({ travelBuddies }),
-// }))
 
 
 export const useUserStore = create<UserStore>()(
@@ -67,6 +55,12 @@ export const useUserStore = create<UserStore>()(
 
       viewUserProfile : null,
       setViewUserProfile: (viewUserProfile: FullUserProfile) => set({ viewUserProfile }),
+
+      userFullProfile : null,
+      setUserFullProfile: (userFullProfile: FullUserProfile) => set({ userFullProfile }),
+
+      updateError : false,
+      setUpdateError: (updateError: boolean) => set({ updateError }),
     }),
     {
       name: "hello-world",
@@ -74,12 +68,18 @@ export const useUserStore = create<UserStore>()(
       partialize: () => ({}),
       onRehydrateStorage : ()=> (state) => {
         if (state?.userData) {
+          if(!state?.userData?.data?.avatar_url){
+            state?.setUpdateError(true)
+          }else{
+            state?.setUpdateError(false)
+          }
           state?.setIsLoggedIn(true);
         }else{
+          state?.setUpdateError(false)
           state?.setIsLoggedIn(false)
           state?.removeUserData()
+          state?.setHasHydrated(true);
         }
-        state?.setHasHydrated(true);
       },
     },
   )

@@ -1,23 +1,26 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
- 
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
 // This function can be marked `async` if using `await` inside
 export async function proxy(request: NextRequest) {
+  const cookie = request.cookies.getAll();
 
-  const cookie = request.cookies.getAll()
-  
-  const aaaa = cookie.find((c) => c.value.startsWith("base64-"))?.value
+  const aaaa = cookie.find((c) => c.value.startsWith("base64-"))?.value;
 
-  if (!aaaa) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  const pathname = request.nextUrl.pathname;
+
+  if (pathname === "/auth/reset-password") {
+    const hash = window.location.hash;
+    if (!hash) {
+      return NextResponse.redirect(new URL("/reset-password", request.url));
+    }
   }
-  return NextResponse.next()
+  if (!aaaa) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+  return NextResponse.next();
 }
- 
+
 export const config = {
-  matcher: [
-    '/dashboard/:path*',
-    '/trips/:path*',
-    '/profiles/:path*'
-  ]
+  matcher: ["/dashboard", "/profile/:path*"],
 };

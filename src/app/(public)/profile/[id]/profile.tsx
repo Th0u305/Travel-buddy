@@ -125,7 +125,7 @@ export default function Profile({ id }: { id: string }) {
                     </>
                   )}
                   <span className="text-lg">
-                    {0} Expeditions
+                    {profile?.travel_plans?.length} Expeditions
                   </span>
                 </div>
               </div>

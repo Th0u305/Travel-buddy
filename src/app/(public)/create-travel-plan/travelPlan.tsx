@@ -5,6 +5,7 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import {
   Select,
+  SelectButton,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -18,6 +19,7 @@ import {
   Compass,
   Edit,
   Map,
+  SearchIcon,
   Users,
   XCircleIcon,
 } from "lucide-react";
@@ -38,7 +40,7 @@ import {
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { Calendar } from "@/src/components/ui/calendar";
-import { useCanUserCreateTrip } from "@/src/tanstack/useQuery";
+import { useCanUserCreateTrip, useGetCountries } from "@/src/tanstack/useQuery";
 import { useUserStore } from "@/src/store/zustand.store";
 import {
   AlertDialog,
@@ -51,10 +53,21 @@ import {
 } from "@/src/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
 import AddTags from "./addTags";
+import { Field, FieldLabel } from "@/src/components/ui/field";
+import {
+  Combobox,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopup,
+  ComboboxTrigger,
+  ComboboxValue,
+} from "@/src/components/ui/combobox";
 
 export default function TravelPlan() {
   const router = useRouter();
-  const { userData } = useUserStore();
+  const { userData, updateError } = useUserStore();
   const { canCreateTrip } = useCanUserCreateTrip(userData?.data?.id || "");
   const [open, setOpen] = useState(false);
 
@@ -79,12 +92,19 @@ export default function TravelPlan() {
 
   const [date, setDate] = useState<DateRange | undefined>();
 
+  const [searchCountry, setSearchCountry] = useState<string>("");
+  const { countries } = useGetCountries(searchCountry);
+
   useEffect(() => {
-    if (canCreateTrip > 0) {
+    if (updateError) {
+      toast.error("Please update your profile before creating a travel plan");
+      router.push("/dashboard/profile");
+    }
+    if (!updateError && canCreateTrip > 0) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpen(true);
     }
-  }, [canCreateTrip]);
+  }, [canCreateTrip, updateError, router]);
 
   const form = useForm({
     defaultValues: {
@@ -150,7 +170,6 @@ export default function TravelPlan() {
 
       const validate = createPlanSchema.safeParse(modifiedData);
 
-
       if (!validate.success) {
         const aaa = validate.error.issues.map((item) => item.message);
         return aaa.forEach((msg) => {
@@ -198,6 +217,7 @@ export default function TravelPlan() {
         setIsLoading(false);
         toast.dismiss();
         setTags(["Photography", "Adventure"]);
+        setSearchCountry("");
         form.reset();
         setDate(undefined);
         startTransition(() => {
@@ -314,33 +334,67 @@ export default function TravelPlan() {
                   {/* country and city */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* country */}
-                    <div className="flex flex-col gap-2">
-                      <label className="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider">
+                    <Field className="m-1">
+                      <FieldLabel
+                        className="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider"
+                        htmlFor="country"
+                      >
                         Country
-                      </label>
-
+                      </FieldLabel>
                       <form.Field name="country">
                         {(field) => {
                           return (
-                            <>
-                              <Input
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                type="text"
-                                placeholder="Peru"
-                                onChange={(e) =>
-                                  field.handleChange(e.target.value)
-                                }
-                                required
-                                className="bg-[#dfe4dd] h-15 border-none rounded-xl p-4 focus:ring-2 focus:ring-primary/20 transition-all text-lg font-medium"
-                              />
-                            </>
+                            <Combobox
+                              items={countries}
+                              onValueChange={(e) => {
+                                field.handleChange(e as string);
+                              }}
+                              value={field.state.value}
+                            >
+                              <ComboboxTrigger
+                                className="h-15 bg-[#dfe4dd]"
+                                render={<SelectButton />}
+                              >
+                                <ComboboxValue placeholder="Select a country" />
+                              </ComboboxTrigger>
+                              <ComboboxPopup
+                                aria-label="Select a country"
+                                className="w-1/2"
+                              >
+                                <div className="border-b p-2">
+                                  <ComboboxInput
+                                    className="rounded-md before:rounded-[calc(var(--radius-md)-1px)] pl-8"
+                                    placeholder="Search countries..."
+                                    showTrigger={false}
+                                    startAddon={<SearchIcon />}
+                                    onChange={(e) =>
+                                      setSearchCountry(e.target.value)
+                                    }
+                                  />
+                                </div>
+                                <ComboboxEmpty>
+                                  No countries found.
+                                </ComboboxEmpty>
+                                <ComboboxList>
+                                  {countries?.length > 0 ? (
+                                    (item) => (
+                                      <ComboboxItem
+                                        key={item.iso2}
+                                        value={item.name}
+                                      >
+                                        {item.name}
+                                      </ComboboxItem>
+                                    )
+                                  ) : (
+                                    <Spinner className="w-8 h-8 text-blue-500" />
+                                  )}
+                                </ComboboxList>
+                              </ComboboxPopup>
+                            </Combobox>
                           );
                         }}
                       </form.Field>
-                    </div>
+                    </Field>
 
                     {/* city */}
                     <div className="flex flex-col gap-2">

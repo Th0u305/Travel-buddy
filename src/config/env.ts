@@ -24,6 +24,8 @@ interface EnvConfig {
     NEXT_PUBLIC_VERIFY_OTP : string;
     NEXT_PUBLIC_GET_USER_FULL_PROFILE : string;
     NEXT_PUBLIC_UPDATE_PROFILE : string;
+    NEXT_PUBLIC_UPDATE_PASSWORD : string;
+    NEXT_PUBLIC_FORGOT_PASSWORD_SESSION_EXCHANGE : string;
 }
 
 
@@ -53,7 +55,9 @@ const loadEnvVariables = (): EnvConfig => {
         "NEXT_PUBLIC_SEND_OTP",
         "NEXT_PUBLIC_VERIFY_OTP",
         "NEXT_PUBLIC_GET_USER_FULL_PROFILE",
-        "NEXT_PUBLIC_UPDATE_PROFILE"
+        "NEXT_PUBLIC_UPDATE_PROFILE",
+        "NEXT_PUBLIC_UPDATE_PASSWORD",
+        "NEXT_PUBLIC_FORGOT_PASSWORD_SESSION_EXCHANGE"
     ]
 
     requireEnvVariable.forEach((variable) => {
@@ -89,6 +93,8 @@ const loadEnvVariables = (): EnvConfig => {
         NEXT_PUBLIC_VERIFY_OTP: process.env.NEXT_PUBLIC_VERIFY_OTP as string,
         NEXT_PUBLIC_GET_USER_FULL_PROFILE: process.env.NEXT_PUBLIC_GET_USER_FULL_PROFILE as string,
         NEXT_PUBLIC_UPDATE_PROFILE: process.env.NEXT_PUBLIC_UPDATE_PROFILE as string,
+        NEXT_PUBLIC_UPDATE_PASSWORD: process.env.NEXT_PUBLIC_UPDATE_PASSWORD as string,
+        NEXT_PUBLIC_FORGOT_PASSWORD_SESSION_EXCHANGE: process.env.NEXT_PUBLIC_FORGOT_PASSWORD_SESSION_EXCHANGE as string,
     }
 }
 

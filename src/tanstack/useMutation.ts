@@ -39,12 +39,10 @@ export const useRegister = () => {
         toast.dismiss();
         return;
       }
-      if (data?.data?.data?.user) {
-        toast.success("Successfully registered");
-        toast.info("Please login to continue");
-        toast.dismiss();
-        return router.push("/login");
-      }
+      toast.success("Successfully registered");
+      toast.info("Please login to continue");
+      toast.dismiss();
+      return router.push("/login");
     },
     retry(failureCount) {
       if (failureCount > 3) {
@@ -78,6 +76,7 @@ export const useLogin = () => {
     mutationFn: async (value: { email: string; password: string }) => {
       toast.loading("Logging in...");
       const data = await axiosInstance.post(envVars.NEXT_PUBLIC_LOGIN, value);
+      console.log(data?.data?.data);
       if (data?.data?.data?.code === "invalid_credentials") {
         toast.error("Incorrect email or password");
         toast.dismiss();
@@ -196,13 +195,13 @@ export const useGoogleLogin = () => {
 
 export const useForgotPassword = () => {
   const { mutate: forgotPasswordMutate } = useMutation({
-    mutationFn: async (value: { email: string; password: string }) => {
+    mutationFn: async (value: { email: string}) => {
       const data = await axiosInstance.post(
         envVars.NEXT_PUBLIC_FORGOT_PASSWORD,
         value,
       );
-      if (data?.data?.status >= 400) {
-        return toast.error("Something went wrong");
+      if (!data?.data?.success) {
+        return toast.error("Something went wrong")
       }
       if (data?.data?.status === 200) {
         return toast.success(data?.data?.message);
@@ -218,6 +217,56 @@ export const useForgotPassword = () => {
   });
 
   return { forgotPasswordMutate };
+};
+
+export const useExchangeSessionForgetPassword = () => {
+  const { mutate: exchangeSessionForgetPasswordMutate } = useMutation({
+    mutationFn: async (value: { access_token: string, refresh_token: string }) => {
+      const data = await axiosInstance.post(
+        envVars.NEXT_PUBLIC_FORGOT_PASSWORD_SESSION_EXCHANGE,
+        value,
+      )
+      return data
+    },
+    retry(failureCount) {
+      if (failureCount > 2) {
+        toast.error("Too many attempts. Please try again later");
+        return false;
+      }
+      return true;
+    },
+  });
+
+  return { exchangeSessionForgetPasswordMutate };
+};
+
+export const useUpdatePassword = () => {
+  const { mutate: updatePasswordMutate } = useMutation({
+    mutationFn: async (value: { password: string}) => {
+      const data = await axiosInstance.put(
+        envVars.NEXT_PUBLIC_UPDATE_PASSWORD,
+        value,
+      );
+      if (data?.data?.status === 422 && data?.data?.message === "same_password") {
+        return toast.error("Your old password and new password are the same");
+      }
+      if (!data?.data?.success) {
+        return toast.error("Something went wrong")
+      }
+      if (data?.data?.status === 200) {
+        return toast.success(data?.data?.message);
+      }
+    },
+    retry(failureCount) {
+      if (failureCount > 2) {
+        toast.error("Too many attempts. Please try again later");
+        return false;
+      }
+      return true;
+    },
+  });
+
+  return { updatePasswordMutate };
 };
 
 export const useCreateTravelPlanMutate = () => {
@@ -274,7 +323,7 @@ export const useSendOTP = () => {
 
 export const useUpdateProfile = () => {
   const { mutate: updateProfileMutate } = useMutation({
-    mutationFn: async (value: { image: string, bio: string , travel_interests: string}) => {
+    mutationFn: async (value: { user_id: string, image: string, bio: string , travel_interests: string, country: string}) => {
       const data = await axiosInstance.post(
         envVars.NEXT_PUBLIC_UPDATE_PROFILE,
         value,

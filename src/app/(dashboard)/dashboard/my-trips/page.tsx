@@ -1,10 +1,8 @@
 "use client";
 
 import { Button } from "@/src/components/ui/button";
-import {
-  useGetTravelListById,
-  useGetUserFullProfile,
-} from "@/src/tanstack/useQuery";
+import { useUserStore } from "@/src/store/zustand.store";
+import { useGetTravelListById } from "@/src/tanstack/useQuery";
 import { TravelListTs } from "@/src/types/types";
 import { ArrowRight, CalendarIcon, Map, MedalIcon } from "lucide-react";
 import Image from "next/image";
@@ -34,7 +32,7 @@ const StatItem = ({
 
 export default function MyTripsDashboard() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const { userFullProfile } = useGetUserFullProfile();
+  const { userFullProfile } = useUserStore()
   useGetTravelListById(hoveredId || "");
   const router = useRouter();
 
@@ -64,9 +62,10 @@ export default function MyTripsDashboard() {
         {/* Trip Grid (Bento/Asymmetric feel) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* trip card */}
-          {userFullProfile?.travel_plans?.map((item: TravelListTs, i: number) => (
-            <div key={i}>
-              <article className="bg-accent rounded-3xl p-3 shadow-[0_8px_32px_rgba(48,51,46,0.04)] flex flex-col gap-4 relative overflow-hidden group">
+          {userFullProfile?.travel_plans?.length || 0 > 0 ? (
+            userFullProfile?.travel_plans?.map((item: TravelListTs, i: number) => (
+              <div key={i} className="bg-accent rounded-3xl p-3 flex flex-col gap-4 relative overflow-hidden group">
+               
                 {/* Image Header */}
                 <div className="relative w-full h-56 rounded-3xl overflow-hidden">
                   <Image
@@ -129,7 +128,7 @@ export default function MyTripsDashboard() {
 
                     <div className="flex gap-2">
                       <Button
-                        size="xl"
+                        size="lg"
                         variant="link"
                         onClick={() => router.push(`/trips/${item.slug}`)}
                         className="bg-white hover:scale-105 transition-all active:scale-100 w-10 h-10 rounded-full border border-primary">
@@ -138,9 +137,13 @@ export default function MyTripsDashboard() {
                     </div>
                   </div>
                 </div>
-              </article>
+              </div>
+          ))
+          ) : (
+            <div className=" flex items-center justify-center bg-accent rounded-3xl p-3 flex-col gap-4 relative overflow-hidden group">
+              <p className="text-on-surface-variant">No trips found</p>
             </div>
-          ))}
+          )}
 
           {/* Static New Trip Action Card */}
           <div className="bg-accent rounded-3xl p-6 flex flex-col items-center justify-center text-center gap-4 min-h-75 border border-outline-variant/15 border-dashed">
@@ -166,7 +169,7 @@ export default function MyTripsDashboard() {
 
       {/* Right Column: Sidebar Stats (Visible on desktop) */}
       <aside className="hidden lg:flex flex-col gap-6 w-1/3 xl:w-1/4">
-        <div className="bg-surface-container-lowest rounded-3xl p-6 shadow-[0_8px_32px_rgba(48,51,46,0.04)] flex flex-col gap-6 sticky top-28">
+        <div className="bg-white rounded-3xl p-6 shadow-[0_8px_32px_rgba(48,51,46,0.04)] flex flex-col gap-6 sticky top-28">
           {/* User Profile Header */}
           <div className="flex items-center gap-4 overflow-hidden">
               <Image
@@ -214,7 +217,7 @@ export default function MyTripsDashboard() {
           </div>
 
           {/* Achievement Banner */}
-          <div className="bg-surface-container-low rounded-xl p-4 flex items-start gap-3 mt-2">
+          <div className="bg-[#f4f5f0] rounded-xl p-4 flex items-start gap-3 mt-2">
             <MedalIcon/>
             <div>
               <h5 className="text-sm font-headline font-bold text-on-surface mb-1">

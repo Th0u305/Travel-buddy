@@ -206,6 +206,7 @@ export function useUpdateTripStatus() {
 }
 
 export function useGetUserFullProfile() {
+  const { setUserFullProfile } = useUserStore();
   const { data: userFullProfile, refetch: getUserFullProfileRefetch , isLoading} = useQuery({
     queryKey: ["getUserFullProfile"],
     queryFn: async () => {
@@ -215,6 +216,7 @@ export function useGetUserFullProfile() {
       if (!res?.data?.success) {
         return toast.error("Something went wrong");
       }
+      setUserFullProfile(res?.data?.data)
       return res?.data?.data;
     },
     retry: 1,

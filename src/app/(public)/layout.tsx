@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import Footer from "@/src/components/layout/Footer";
 import Navbar from "@/src/components/layout/Navbar";
 import { useGetUserProfile } from "@/src/tanstack/useQuery";
+import UpdateUserError from "@/src/components/layout/UpdateUserError";
+import { useUserStore } from "@/src/store/zustand.store";
 // import Loading from "@/src/components/loading";
 // import { useUserStore } from "@/src/store/zustand.store";
 
@@ -13,6 +15,7 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   const { userProfileRefetch } = useGetUserProfile();
+  const updateError = useUserStore((state) => state.updateError);
   // const hasHydrated = useUserStore((state) => state.hasHydrated);
 
   useEffect(() => {
@@ -28,10 +31,15 @@ export default function PublicLayout({
   // }
 
   return (
-    <>
+    <div className="relative">
+      {updateError && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-10">
+          <UpdateUserError />
+        </div>
+      )}
       <Navbar />
       {children}
       <Footer />
-    </>
+    </div>
   );
 }

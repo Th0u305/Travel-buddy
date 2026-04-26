@@ -118,12 +118,7 @@ export default function Navbar() {
                 <DropdownMenuTrigger>
                   <div className="border hover:border-primary flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-primary transition-colors cursor-pointer">
                     <Avatar className="w-8 h-8">
-                      <AvatarImage
-                        src={
-                          user?.data?.avatar_url ||
-                          "#"
-                        }
-                      />
+                      <AvatarImage src={user?.data?.avatar_url || "#"} />
                       <AvatarFallback className="bg-background text-primary text-xs font-semibold">
                         {user?.data?.full_name?.charAt(0)?.toUpperCase()}
                       </AvatarFallback>
@@ -140,12 +135,18 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
                   <DropdownMenuItem>
-                    <Link href="/dashboard/profile" className="flex items-center gap-2">
+                    <Link
+                      href="/dashboard/profile"
+                      className="flex items-center gap-2"
+                    >
                       <User className="w-4 h-4" /> My Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link href="/dashboard/my-trips" className="flex items-center gap-2">
+                    <Link
+                      href="/dashboard/my-trips"
+                      className="flex items-center gap-2"
+                    >
                       <Map className="w-4 h-4" /> My Plans
                     </Link>
                   </DropdownMenuItem>
@@ -174,7 +175,7 @@ export default function Navbar() {
               <Button
                 size="lg"
                 onClick={() => router.push("/login")}
-                className="rounded-xl px-6 cursor-pointer hidden md:block"
+                className="rounded-xl px-6 cursor-pointer hidden md:block active:scale-95 transition-all"
               >
                 Sign In
               </Button>
@@ -222,6 +223,18 @@ export default function Navbar() {
                         {link.label}
                       </Link>
                     ))}
+                    {user?.data?.email && user?.data?.full_name && (
+                      <Link
+                        href="/create-travel-plan"
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                          location === "/create-travel-plan"
+                            ? "bg-primary/10 text-primary"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                        }`}
+                      >
+                        <Map className="w-4 h-4" /> Create Travel Plan
+                      </Link>
+                    )}
                   </div>
                   <div className="p-4 border-t">
                     {isAuthenticated === true ? (
@@ -232,18 +245,15 @@ export default function Navbar() {
                           className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted"
                         >
                           <Avatar className="w-8 h-8">
-                            <AvatarImage
-                              src={
-                                user?.data?.avatar_url ||
-                                "#"
-                              }
-                            />
+                            <AvatarImage src={user?.data?.avatar_url || "#"} />
                             <AvatarFallback className="bg-primary/10 text-primary text-xs">
                               {user?.data?.full_name?.charAt(0)?.toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="text-sm font-medium">{user?.data?.full_name}</p>
+                            <p className="text-sm font-medium">
+                              {user?.data?.full_name}
+                            </p>
                             <p className="text-xs text-muted-foreground">
                               {user?.data?.email}
                             </p>
@@ -262,7 +272,7 @@ export default function Navbar() {
                     ) : (
                       <Button
                         size="lg"
-                        className="w-full rounded-xl cursor-pointer"
+                        className="w-full rounded-xl cursor-pointer active:scale-95 transition-all"
                         onClick={() => router.push("/login")}
                       >
                         Sign In

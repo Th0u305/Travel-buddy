@@ -45,10 +45,10 @@ export default function NotFound() {
 
           {/* Navigation Actions */}
           <div className="flex flex-col sm:flex-row gap-4 w-full justify-evenly">
-            <Button className="w-50 h-20 rounded-full cursor-pointer">
+            <Button size="xl" className="rounded-full cursor-pointer">
               <Home className="mr-2" /> Back to Home
             </Button>
-            <Button className="w-50 h-20 rounded-full cursor-pointer">
+            <Button size="xl" className="rounded-full cursor-pointer">
               <BookOpen className="mr-2" /> View Journeys
             </Button>
           </div>

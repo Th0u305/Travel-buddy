@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
@@ -126,6 +125,7 @@ export default function SettingsPage() {
                     </InputGroupAddon>
                   </InputGroup>
                 </div>
+                <Button size="lg" variant="default" className="col-span-2 active:scale-95 transition-all w-7  0 mx-auto">Update Password</Button>
               </div>
               <div className="bg-white rounded-xl p-6 shadow-sm flex items-center justify-between group">
                 <div className="flex items-start gap-4">

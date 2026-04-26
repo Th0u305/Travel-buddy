@@ -1,10 +1,9 @@
 export interface FullUserProfile {
-  data: {
-    avatar_url: string | null;
-    bio: string | null;
-    created_at: string;
-    country: string | null;
-    email: string;
+  avatar_url: string | null;
+  bio: string | null;
+  created_at: string;
+  country: string | null;
+  email: string;
     full_name: string | null;
     id: string;
     is_admin: boolean;
@@ -18,7 +17,7 @@ export interface FullUserProfile {
     visited_countries: string | null;
     is_deleted: boolean;
     username_slug: string | null;
-  };
+    travel_plans?: TravelListTs[];
 }
 
 export interface CreateTravelPlanTs {
@@ -65,6 +64,8 @@ export interface SmallProfile {
   full_name: string;
   avatar_url: string;
   username_slug: string | null;
+  is_password : boolean;
+  provider : string[]
 }
 export interface SmallProfileZustand {
   data: SmallProfile

@@ -13,59 +13,38 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
 } from "@/src/components/ui/field";
 import { Input } from "@/src/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
-import { EyeIcon, EyeOffIcon, SearchIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
-import { useRegister, useGoogleLogin } from "@/src/tanstack/useMutation";
+import { useGoogleLogin } from "@/src/tanstack/useMutation";
 import { toast } from "sonner";
-import { formSchema, loginSchema } from "@/src/zod/zodValidation";
+import { loginSchema } from "@/src/zod/zodValidation";
 import { useUserStore } from "@/src/store/zustand.store";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { envVars } from "@/src/config/env";
-import {
-  Combobox,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxPopup,
-  ComboboxTrigger,
-  ComboboxValue,
-} from "@/src/components/ui/combobox";
-import { SelectButton } from "@/src/components/ui/select";
-import { useGetCountries } from "@/src/tanstack/useQuery";
 import OtpPage from "./otpPage";
 import { Spinner } from "@/src/components/ui/spinner";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/src/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/src/components/ui/input-group";
 
 export default function LoginForm() {
   const [showPass, setShowPass] = useState<boolean>(false);
-  const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
-  const [isSignUp, setIsSignUp] = useState<string>("Login");
-  const { registerMutate } = useRegister();
   const { googleLoginMutate } = useGoogleLogin();
   const { userData: user } = useUserStore();
   const [token, setToken] = useState<string | null>(null);
   const captchaRef = useRef<HCaptcha>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [searchCountry, setSearchCountry] = useState<string>("");
-  const { countries } = useGetCountries(searchCountry);
   const [isOtp, setIsOtp] = useState<boolean>(false);
   const [loginFormValue, setLoginFormValue] = useState<{
     email: string;
     password: string;
   } | null>(null);
-
-  const loginOrSignUp = () => {
-    setIsSignUp(isSignUp === "Sign Up" ? "Login" : "Sign Up");
-    form.reset();
-    setToken(null);
-    captchaRef.current?.resetCaptcha();
-  };
 
   const form = useForm({
     defaultValues: {
@@ -79,46 +58,27 @@ export default function LoginForm() {
 
     onSubmit: async ({ value }) => {
       const validateLogin = loginSchema.safeParse(value);
-      const validateRegister = formSchema.safeParse(value);
 
       if (user !== null) return toast.error("You are already logged in");
 
-      if (isSignUp === "Sign Up") {
-        if (!validateRegister.success) {
-          const aaa = validateRegister.error.issues.map((item) => item.message);
-          aaa.forEach((msg) => {
-            toast.error(msg);
-          });
-          return;
-        }
-
-        if (value.password !== value.confirm_password)
-          return toast.error("Passwords do not match");
-
-        if (!token) return toast.error("Please verify you are not a robot");
-
-        setIsLoading(true);
-        registerMutate(value);
-        setIsLoading(false);
-        form.reset();
+      if (!validateLogin.success) {
+        const bbb = validateLogin.error.issues.map((item) => item.message);
+        bbb.forEach((msg) => {
+          toast.error(msg);
+        });
+        return;
       }
-      if (isSignUp === "Login") {
-        if (!validateLogin.success) {
-          const bbb = validateLogin.error.issues.map((item) => item.message);
-          bbb.forEach((msg) => {
-            toast.error(msg);
-          });
-          return;
-        }
 
-        if (!token) return toast.error("Please verify you are not a robot");
+      if (!token) return toast.error("Please verify you are not a robot");
 
-        setIsLoading(true);
-        setIsOtp(true);
-        setLoginFormValue(value);
-        setIsLoading(false);
-        form.reset();
-      }
+      setIsLoading(true);
+      setIsOtp(true);
+      setLoginFormValue(value);
+      setIsLoading(false);
+      setToken(null);
+      captchaRef.current?.resetCaptcha();
+
+      form.reset();
     },
   });
 
@@ -186,130 +146,6 @@ export default function LoginForm() {
                       Login with Google
                     </Button>
                   </Field>
-
-                  {/* Separator */}
-                  <FieldSeparator
-                    className={`*:data-[slot=field-separator-content]:bg-card ${isSignUp === "Sign Up" ? "md:col-span-2" : ""}`}
-                  >
-                    Or continue with
-                  </FieldSeparator>
-
-                  {/* Sign Up Fields & country */}
-                  {isSignUp === "Sign Up" && (
-                    <>
-                      {/* Name Field */}
-                      <Field>
-                        <FieldLabel htmlFor="name">Name</FieldLabel>
-                        <form.Field name="name">
-                          {(field) => {
-                            return (
-                              <>
-                                <Input
-                                  id={field.name}
-                                  name={field.name}
-                                  value={field.state.value}
-                                  onBlur={field.handleBlur}
-                                  type="text"
-                                  placeholder="Enter your name"
-                                  className="h-10"
-                                  onChange={(e) =>
-                                    field.handleChange(e.target.value)
-                                  }
-                                  required
-                                />
-                              </>
-                            );
-                          }}
-                        </form.Field>
-                      </Field>
-
-                      {/* Phone Number Field */}
-                      <Field>
-                        <FieldLabel htmlFor="phone_number">
-                          Phone Number
-                        </FieldLabel>
-                        <form.Field name="phone_number">
-                          {(field) => {
-                            return (
-                              <>
-                                <Input
-                                  id={field.name}
-                                  name={field.name}
-                                  value={field.state.value}
-                                  onBlur={field.handleBlur}
-                                  type="number"
-                                  placeholder="Enter your phone number"
-                                  className="h-10"
-                                  onChange={(e) =>
-                                    field.handleChange(e.target.value)
-                                  }
-                                  required
-                                />
-                              </>
-                            );
-                          }}
-                        </form.Field>
-                      </Field>
-
-                      {/* Country Field */}
-                      <Field>
-                        <FieldLabel htmlFor="country">Country</FieldLabel>
-                        <form.Field name="country">
-                          {(field) => {
-                            return (
-                              <Combobox
-                                items={countries}
-                                onValueChange={(e) => {
-                                  field.handleChange(e as string);
-                                }}
-                                value={field.state.value}
-                              >
-                                <ComboboxTrigger
-                                  className="h-10"
-                                  render={<SelectButton />}
-                                >
-                                  <ComboboxValue placeholder="Select a country" />
-                                </ComboboxTrigger>
-                                <ComboboxPopup
-                                  aria-label="Select a country"
-                                  className="w-1/2"
-                                >
-                                  <div className="border-b p-2">
-                                    <ComboboxInput
-                                      className="rounded-md before:rounded-[calc(var(--radius-md)-1px)] pl-8"
-                                      placeholder="Search countries..."
-                                      showTrigger={false}
-                                      startAddon={<SearchIcon />}
-                                      onChange={(e) =>
-                                        setSearchCountry(e.target.value)
-                                      }
-                                    />
-                                  </div>
-                                  <ComboboxEmpty>
-                                    No countries found.
-                                  </ComboboxEmpty>
-                                  <ComboboxList>
-                                    {countries?.length > 0 ? (
-                                      (item) => (
-                                        <ComboboxItem
-                                          key={item.iso2}
-                                          value={item.name}
-                                        >
-                                          {item.name}
-                                        </ComboboxItem>
-                                      )
-                                    ) : (
-                                      <Spinner className="w-8 h-8 text-blue-500" />
-                                    )}
-                                  </ComboboxList>
-                                </ComboboxPopup>
-                              </Combobox>
-                            );
-                          }}
-                        </form.Field>
-                      </Field>
-                    </>
-                  )}
 
                   {/* Email Field */}
                   <Field>
@@ -382,57 +218,6 @@ export default function LoginForm() {
                     </form.Field>
                   </Field>
 
-                  {/* confirm password */}
-                  {isSignUp === "Sign Up" && (
-                    <Field>
-                      <div className="flex items-center">
-                        <FieldLabel htmlFor="password">
-                          Confirm Password
-                        </FieldLabel>
-                      </div>
-                      <form.Field name="confirm_password">
-                        {(field) => {
-                          return (
-                            <>
-                              <InputGroup className="h-10">
-                                <InputGroupInput
-                                  id={field.name}
-                                  name={field.name}
-                                  value={field.state.value}
-                                  onBlur={field.handleBlur}
-                                  type={showConfirmPass ? "text" : "password"}
-                                  onChange={(e) =>
-                                    field.handleChange(e.target.value)
-                                  }
-                                  placeholder="Confirm password"
-                                  required
-                                />
-                                <InputGroupAddon
-                                  align="inline-end"
-                                  className="cursor-pointer"
-                                >
-                                  {!showConfirmPass && (
-                                    <EyeOffIcon
-                                      onClick={() =>
-                                        setShowConfirmPass(!showConfirmPass)
-                                      }
-                                    />
-                                  )}
-                                  {showConfirmPass && (
-                                    <EyeIcon
-                                      onClick={() =>
-                                        setShowConfirmPass(!showConfirmPass)
-                                      }
-                                    />
-                                  )}
-                                </InputGroupAddon>
-                              </InputGroup>
-                            </>
-                          );
-                        }}
-                      </form.Field>
-                    </Field>
-                  )}
                   <div className="w-fit mx-auto">
                     <Link
                       href="/reset-password"
@@ -449,17 +234,13 @@ export default function LoginForm() {
                     ref={captchaRef}
                   />
 
-                  <Field
-                    className={isSignUp === "Sign Up" ? "md:col-span-2" : ""}
-                  >
-                    <Button size="lg" type="submit" className="cursor-pointer">
-                      {isLoading ? <Spinner /> : isSignUp}
+                  <Field>
+                    <Button size="lg" type="submit" className="cursor-pointer active:scale-95 transition-all">
+                      {isLoading ? <Spinner /> : "Login"}
                     </Button>
                     <FieldDescription className="text-center">
                       Already have an account?
-                      <Link href="#" onClick={() => loginOrSignUp()}>
-                        {isSignUp === "Sign Up" ? "Login" : "Sign Up"}
-                      </Link>
+                      <Link href="/register">Sign Up</Link>
                     </FieldDescription>
                   </Field>
                 </FieldGroup>

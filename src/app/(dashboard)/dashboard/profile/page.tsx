@@ -3,29 +3,51 @@ import React, { startTransition, useOptimistic, useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import Image from "next/image";
 import {
+  useGetCountries,
   useGetUserFullProfile,
   useGetUserProfile,
 } from "@/src/tanstack/useQuery";
 import { useUpdateProfile } from "@/src/tanstack/useMutation";
 import { Spinner } from "@/src/components/ui/spinner";
-import { CameraIcon, Mail, Map, User } from "lucide-react";
+import {
+  CameraIcon,
+  Map,
+  MessageSquareWarning,
+  SearchIcon,
+  User,
+} from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import FileUploader from "@/src/utils/fileUploader";
 import { envVars } from "@/src/config/env";
 import { toast } from "sonner";
+import { Field, FieldLabel } from "@/src/components/ui/field";
+import {
+  Combobox,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopup,
+  ComboboxTrigger,
+  ComboboxValue,
+} from "@/src/components/ui/combobox";
+import { SelectButton } from "@/src/components/ui/select";
+import { useUserStore } from "@/src/store/zustand.store";
 
 export default function ProfilePage() {
-  const { userFullProfile, isLoading } = useGetUserFullProfile();
+  const { isLoading, getUserFullProfileRefetch } = useGetUserFullProfile();
+  const { userFullProfile } = useUserStore()
   const [image, setImage] = useState<string>(userFullProfile?.avatar_url || "");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [resetForm, setResetForm] = useState<boolean>(false);
   const [, mutateOptimisticImage] = useOptimistic<string>(image);
-  const [optimisticImageFile, mutateOptimisticImageFile] =
-    useOptimistic<File | null>(imageFile);
+  const [optimisticImageFile, mutateOptimisticImageFile] = useOptimistic<File | null>(imageFile);
 
   const { updateProfileMutate } = useUpdateProfile();
-  const { getUserFullProfileRefetch } = useGetUserFullProfile();
   const { userProfileRefetch } = useGetUserProfile();
+
+  const [searchCountry, setSearchCountry] = useState<string>("");
+  const { countries } = useGetCountries(searchCountry);
 
   const displayVisitedCountries = Array.isArray(
     userFullProfile?.visited_countries,
@@ -33,13 +55,17 @@ export default function ProfilePage() {
     ? userFullProfile?.visited_countries.join(", ")
     : userFullProfile?.visited_countries || "";
 
+  const travelInterests = Array.isArray(userFullProfile?.travel_interests)
+    ? userFullProfile?.travel_interests
+    : userFullProfile?.travel_interests || "";
+    
   const form = useForm({
     defaultValues: {
       bio: "",
       travel_interests: "",
+      country: "",
     },
     onSubmit: async ({ value }) => {
-
       if (value.bio === userFullProfile?.bio) {
         return toast.error("You cannot add same bio");
       }
@@ -77,11 +103,14 @@ export default function ProfilePage() {
         }
 
         updateProfileMutate({
+          user_id: userFullProfile?.id || "",
           image: data || "",
           bio: value.bio,
           travel_interests: value.travel_interests,
+          country: value.country,
         });
 
+        toast.dismiss();
         startTransition(() => {
           mutateOptimisticImage(data || "");
           setImageFile(null);
@@ -110,7 +139,9 @@ export default function ProfilePage() {
         </h1>
       </div>
       {isLoading ? (
-        <Spinner className="w-fit mx-auto text-blue-600" />
+        <div className="h-screen">
+          <Spinner className="w-fit mx-auto text-blue-600" />
+        </div>
       ) : (
         <>
           <section className="relative flex flex-col md:flex-row items-end gap-6">
@@ -119,6 +150,7 @@ export default function ProfilePage() {
                 <CameraIcon className="absolute top-[80%] left-[80%] text-white stroke-amber-600 bg-yellow-50 rounded-full w-7 h-7 p-1" />
                 <Image
                   className="w-full h-full object-cover"
+                  loading="eager"
                   data-alt="avatar"
                   src={
                     userFullProfile?.avatar_url ||
@@ -173,7 +205,7 @@ export default function ProfilePage() {
                 {/* Email - Non Editable */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1">
-                    <Mail /> Email (Non-editable)
+                     Email (Non-editable)
                   </label>
                   <input
                     className="bg-[#dde3dc] w-full bg-surface-container-highest border-none rounded-xl p-4 opacity-70 cursor-not-allowed"
@@ -185,24 +217,103 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Country - Non Editable */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1">
-                    Country (Non-editable)
-                  </label>
-                  <input
-                    className="bg-[#dde3dc] w-full bg-surface-container-highest border-none rounded-xl p-4 opacity-70 cursor-not-allowed"
-                    type="text"
-                    value={userFullProfile?.country || ""}
-                    disabled
-                    readOnly
-                  />
-                </div>
+
+                {!userFullProfile?.country && (
+                  <div>
+                    <p className="text-red-500 flex gap-2">
+                      <MessageSquareWarning /> Please add your country
+                    </p>
+                  </div>
+                )}
+                {userFullProfile?.country && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1">
+                      Country (Non-editable)
+                    </label>
+                    <input
+                      className="bg-[#dde3dc] w-full bg-surface-container-highest border-none rounded-xl p-4 opacity-70 cursor-not-allowed"
+                      type="text"
+                      value={userFullProfile?.country || ""}
+                      disabled
+                      readOnly
+                    />
+                  </div>
+                )}
+
+                <Field className="m-1">
+                  <FieldLabel
+                    className="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider"
+                    htmlFor="country"
+                  >
+                    Country
+                  </FieldLabel>
+                  <form.Field name="country">
+                    {(field) => {
+                      return (
+                        <Combobox
+                          items={countries}
+                          onValueChange={(e) => {
+                            field.handleChange(e as string);
+                          }}
+                          value={field.state.value}
+                        >
+                          <ComboboxTrigger
+                            className="h-15 bg-[#dfe4dd]"
+                            render={<SelectButton />}
+                          >
+                            <ComboboxValue placeholder="Select a country" />
+                          </ComboboxTrigger>
+                          <ComboboxPopup
+                            aria-label="Select a country"
+                            className="w-1/2"
+                          >
+                            <div className="border-b p-2">
+                              <ComboboxInput
+                                className="rounded-md before:rounded-[calc(var(--radius-md)-1px)] pl-8"
+                                placeholder="Search countries..."
+                                showTrigger={false}
+                                startAddon={<SearchIcon />}
+                                onChange={(e) =>
+                                  setSearchCountry(e.target.value)
+                                }
+                              />
+                            </div>
+                            <ComboboxEmpty>No countries found.</ComboboxEmpty>
+                            <ComboboxList>
+                              {countries?.length > 0 ? (
+                                (item) => (
+                                  <ComboboxItem
+                                    key={item.iso2}
+                                    value={item.name}
+                                  >
+                                    {item.name}
+                                  </ComboboxItem>
+                                )
+                              ) : (
+                                <Spinner className="w-8 h-8 text-blue-500" />
+                              )}
+                            </ComboboxList>
+                          </ComboboxPopup>
+                        </Combobox>
+                      );
+                    }}
+                  </form.Field>
+                </Field>
+
+                {!userFullProfile?.avatar_url && (
+                  <div>
+                    <p className="text-red-500 flex gap-2 mt-5">
+                      <MessageSquareWarning /> Please upload your image
+                    </p>
+                  </div>
+                )}
 
                 {/* Avatar URL - Editable */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1">
                     Avatar URL
                   </label>
+
                   <FileUploader
                     profile_image={true}
                     setImageFile={setImageFile}
@@ -215,6 +326,13 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Bio - Editable */}
+                {!userFullProfile?.bio && (
+                  <div>
+                    <p className="text-red-500 flex gap-2">
+                      <MessageSquareWarning /> Please add your bio
+                    </p>
+                  </div>
+                )}
                 <form.Field name="bio">
                   {(field) => (
                     <div className="space-y-2">
@@ -246,19 +364,23 @@ export default function ProfilePage() {
                   </h3>
                 </div>
                 <div className="flex flex-2 flex-wrap gap-2 mt-5 mb-5">
-                  {userFullProfile?.travel_interests.map((item: string, idx: number) => {
-                    return (
-                      <span
-                        key={idx}
-                        className={`relative flex-wrap  text-on-secondary-container px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${idx % 2 === 0 ? "bg-secondary" : "bg-accent"}`}
-                      >
-                        <span className="material-symbols-outlined text-sm">
-                          {item}
-                        </span>
-                        {/* <XCircleIcon  className="text-red-500 bg-white rounded-full outline-0 border-0 p-0 w-5 h-5 cursor-pointer absolute top-0 right-0 -translate-y-1 translate-x-1" /> */}
-                      </span>
-                    );
-                  })}
+                  {userFullProfile?.travel_interests?.length === 0 ? (
+                    <p className="text-red-500 flex gap-2">
+                      <MessageSquareWarning /> Please add your travel interests
+                    </p>
+                  ) : (
+                    <>
+                        <span
+                          // className={`relative flex-wrap  text-on-secondary-container px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${idx % 2 === 0 ? "bg-secondary" : "bg-accent"}`}
+                        >
+                          <span className="material-symbols-outlined text-sm">
+                            {travelInterests}
+                          </span>
+                          {/* <XCircleIcon  className="text-red-500 bg-white rounded-full outline-0 border-0 p-0 w-5 h-5 cursor-pointer absolute top-0 right-0 -translate-y-1 translate-x-1" /> */}
+                        </span>;
+                      </>
+                    
+                  )}
                 </div>
                 <div className="space-y-5">
                   {/* Travel Interests - Editable */}
@@ -288,7 +410,7 @@ export default function ProfilePage() {
                     </label>
                     <textarea
                       className="bg-[#dde3dc] w-full bg-surface-container-highest border-none rounded-xl p-4 opacity-70 cursor-not-allowed resize-none"
-                      rows={3}
+                      rows={1}
                       value={displayVisitedCountries}
                       disabled
                       readOnly

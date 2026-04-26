@@ -256,8 +256,8 @@ export default function FindBuddies() {
                         </div>
                       )}
 
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <div className="flex items-center w-fit gap-2 flex-wrap">
+                      <div className="flex items-center flex-wrap gap-2">
+                        <div className="flex items-center gap-2">
                           <Link
                             prefetch={true}
                             href={`/trips/${traveler.slug}`}

@@ -26,7 +26,6 @@ export async function GET(request: Request) {
               cookieStore.set({ name, value, ...options });
             });
           },
-
         },
       }
     );

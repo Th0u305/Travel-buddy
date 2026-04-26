@@ -9,6 +9,7 @@ import {
 } from "@/src/components/ui/dashboardSidebar";
 import { useUserStore } from "@/src/store/zustand.store";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function DashboardLayout() {
   const { userData } = useUserStore();
@@ -34,10 +35,11 @@ export default function DashboardLayout() {
       icon: <Home className="h-5 w-5 shrink-0 stroke-green-600" />,
     },
   ];
+
   const [open, setOpen] = useState(false);
+
   return (
-    <div
-    >
+    <div>
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-1 flex-col pt-10 overflow-x-hidden overflow-y-auto">
@@ -75,7 +77,7 @@ export default function DashboardLayout() {
 }
 export const Logo = () => {
   return (
-    <a
+    <Link
       href="/home"
       className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
     >
@@ -93,7 +95,7 @@ export const Logo = () => {
       >
         Travel Buddey
       </motion.span>
-    </a>
+    </Link>
   );
 };
 export const LogoIcon = () => {
