@@ -25,7 +25,7 @@ import {
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { toast } from "sonner";
 import { forgotPassword } from "@/src/zod/zodValidation";
-import { useExchangeSessionForgetPassword, useLogout, useUpdatePassword } from "@/src/tanstack/useMutation";
+import { useExchangeSessionForgetPassword, useLogout, useResetPassword } from "@/src/tanstack/useMutation";
 import { useRouter } from "next/navigation";
 
 export default function ResetPasswordPage() {
@@ -33,7 +33,7 @@ export default function ResetPasswordPage() {
   const [showPass, setShowPass] = useState<boolean>(false);
   const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
   const { exchangeSessionForgetPasswordMutate } = useExchangeSessionForgetPassword()
-  const {updatePasswordMutate} = useUpdatePassword()
+  const {resetPasswordMutate} = useResetPassword()
   const {logoutMutate} = useLogout()
   const router = useRouter()
 
@@ -61,11 +61,12 @@ export default function ResetPasswordPage() {
         toast.error("Invalid or expired reset link");
       }
     } else {
-      toast.error("Please use the link from your email")
+      router.push("/reset-password")
+      // toast.error("Please use the link from your email")
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+  
   const form = useForm({
     defaultValues: {
       email: "",
@@ -87,12 +88,12 @@ export default function ResetPasswordPage() {
       if (value.new_password !== value.confirm_password) return toast.error("Passwords do not match");
 
       try {
-        updatePasswordMutate({password: value.new_password})
+        resetPasswordMutate({password: value.new_password})
         logoutMutate();
         toast.info("Please login with your new password");
         router.push("/login");
       } catch (err) {
-        console.error(err)
+        return err
       }
     },
   });

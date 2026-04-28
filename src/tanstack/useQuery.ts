@@ -119,11 +119,7 @@ export function useFindBuddies(
 }
 
 export function useGetCountries(searchQuery: string) {
-  const {
-    data: countries,
-    refetch: countriesRefetch,
-    isLoading,
-  } = useQuery({
+  const {data: countries,refetch: countriesRefetch,isLoading} = useQuery({
     queryKey: ["countries", searchQuery],
     queryFn: async () => {
       const res = await axiosInstance.get(

@@ -4,20 +4,23 @@ export interface FullUserProfile {
   created_at: string;
   country: string | null;
   email: string;
-    full_name: string | null;
-    id: string;
-    is_admin: boolean;
-    is_premium: boolean;
-    is_verified: boolean;
-    stripe_customer_id: string | null;
-    subscription_expires_at: string | null;
-    subscription_tier: string | null;
-    travel_interests: string | null;
-    updated_at: string;
-    visited_countries: string | null;
-    is_deleted: boolean;
-    username_slug: string | null;
-    travel_plans?: TravelListTs[];
+  full_name: string | null;
+  id: string;
+  is_admin: boolean;
+  is_premium: boolean;
+  is_verified: boolean;
+  subscription_plan: string | null;
+  subscription_expires_at: string | null;
+  subscription_tier: string | null;
+  travel_interests: string | null;
+  updated_at: string;
+  visited_countries: string | null;
+  is_deleted: boolean;
+  username_slug: string | null;
+  travel_plans?: TravelListTs[];
+  is_password: boolean;
+  providers: string[];
+  phone: string | null;
 }
 
 export interface CreateTravelPlanTs {
@@ -32,7 +35,7 @@ export interface CreateTravelPlanTs {
   max_budget: number;
   max_travelers: number;
   trip_description: string;
-  looking_for_buddy : boolean;
+  looking_for_buddy: boolean;
   tags: string[];
 }
 
@@ -56,7 +59,7 @@ export interface TravelListTs {
   updated_at: string;
   profiles: SmallProfile;
   slug: string;
-  participantsId : string[];
+  participantsId: string[];
 }
 export interface SmallProfile {
   id: string;
@@ -64,13 +67,15 @@ export interface SmallProfile {
   full_name: string;
   avatar_url: string;
   username_slug: string | null;
-  is_password : boolean;
-  provider : string[]
+  is_password: boolean;
+  provider: string[];
+  subscription_tier: string | null;
+  subscription_plan: string | null;
+  subscription_expires_at: Date | null;
 }
 export interface SmallProfileZustand {
-  data: SmallProfile
+  data: SmallProfile;
 }
-
 
 export interface TravelBuddiesTs {
   title: string;

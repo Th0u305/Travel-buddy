@@ -21,9 +21,31 @@ import {
   Wallet,
 } from "lucide-react";
 import { useState } from "react";
+import { useUpdatePassword } from "@/src/tanstack/useMutation";
+import { toast } from "sonner";
+import { useUserStore } from "@/src/store/zustand.store";
 
 export default function SettingsPage() {
   const [showPass, setShowPass] = useState<boolean>(false);
+  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const { updatePasswordMutate, isPending } = useUpdatePassword();
+  const {userFullProfile} = useUserStore()
+
+  const canUpdatePassword = userFullProfile?.is_password === false && userFullProfile?.providers?.toString().includes("google");
+
+  const handleUpdatePassword = () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+    updatePasswordMutate({ password: newPassword }, {
+      onSuccess: () => {
+        setPassword("");
+        setNewPassword("");
+      }
+    });
+  }
 
   return (
     <main className="pt-24 pb-32 px-6 max-w-6xl mx-auto">
@@ -75,6 +97,13 @@ export default function SettingsPage() {
               <LockIcon className="fill-green-500 stroke-green-500" />
               Account Security
             </h2>
+
+            {!canUpdatePassword && (
+              <div className="bg-yellow-100 border border-yellow-300 text-red-800 p-4 mb-6 rounded-xl text-sm">
+                <strong>Caution:</strong> Your account was created via social login. You cannot update a password from here.
+              </div>
+            )}
+
             <div className="space-y-6 max-w-2xl">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -86,7 +115,10 @@ export default function SettingsPage() {
                       type={showPass ? "text" : "password"}
                       placeholder="Enter password"
                       className="h-10 "
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       required
+                      disabled={!canUpdatePassword}
                     />
                     <InputGroupAddon
                       align="inline-end"
@@ -110,7 +142,10 @@ export default function SettingsPage() {
                       type={showPass ? "text" : "password"}
                       placeholder="Enter password"
                       className="h-10"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
                       required
+                      disabled={!canUpdatePassword}
                     />
                     <InputGroupAddon
                       align="inline-end"
@@ -125,7 +160,9 @@ export default function SettingsPage() {
                     </InputGroupAddon>
                   </InputGroup>
                 </div>
-                <Button size="lg" variant="default" className="col-span-2 active:scale-95 transition-all w-7  0 mx-auto">Update Password</Button>
+                <Button onClick={handleUpdatePassword} disabled={isPending || !canUpdatePassword} size="lg" variant="default" className="col-span-2 active:scale-95 transition-all w-70 mx-auto">
+                    {isPending ? "Updating..." : "Update Password"}
+                </Button>
               </div>
               <div className="bg-white rounded-xl p-6 shadow-sm flex items-center justify-between group">
                 <div className="flex items-start gap-4">

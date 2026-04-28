@@ -24,30 +24,26 @@ export const useRegister = () => {
         envVars.NEXT_PUBLIC_REGISTER,
         value,
       );
+      toast.dismiss();
       if (data?.data?.data?.code === "phone_number_error") {
         toast.error("This phone number is associated with another account");
-        toast.dismiss();
         return;
       }
       if (data?.data?.data?.code === "email_error") {
         toast.error("This email is already registered");
-        toast.dismiss();
         return;
       }
       if (!data?.data?.data?.user || data?.data?.data?.status >= 400) {
         toast.error("Something went wrong");
-        toast.dismiss();
         return;
       }
       toast.success("Successfully registered");
       toast.info("Please login to continue");
-      toast.dismiss();
       return router.push("/login");
     },
     retry(failureCount) {
       if (failureCount > 3) {
         toast.error("Too many attempts. Please try again later");
-        toast.dismiss();
         return false;
       }
       return true;
@@ -76,26 +72,22 @@ export const useLogin = () => {
     mutationFn: async (value: { email: string; password: string }) => {
       toast.loading("Logging in...");
       const data = await axiosInstance.post(envVars.NEXT_PUBLIC_LOGIN, value);
-      console.log(data?.data?.data);
+      toast.dismiss();
       if (data?.data?.data?.code === "invalid_credentials") {
         toast.error("Incorrect email or password");
-        toast.dismiss();
         return;
       }
       if (data?.data?.data?.code === 302) {
         toast.error(data?.data?.data?.message);
-        toast.dismiss();
         return;
       }
       if (data?.data?.data?.status >= 400) {
         toast.error("Something went wrong");
-        toast.dismiss();
         return;
       }
       if (data?.data?.data?.user) {
         userProfileRefetch();
         toast.success("Successfully logged in");
-        toast.dismiss();
         return router.push("/");
       }
     },
@@ -240,11 +232,11 @@ export const useExchangeSessionForgetPassword = () => {
   return { exchangeSessionForgetPasswordMutate };
 };
 
-export const useUpdatePassword = () => {
-  const { mutate: updatePasswordMutate } = useMutation({
+export const useResetPassword = () => {
+  const { mutate: resetPasswordMutate } = useMutation({
     mutationFn: async (value: { password: string}) => {
       const data = await axiosInstance.put(
-        envVars.NEXT_PUBLIC_UPDATE_PASSWORD,
+        envVars.NEXT_PUBLIC_RESET_PASSWORD,
         value,
       );
       if (data?.data?.status === 422 && data?.data?.message === "same_password") {
@@ -266,7 +258,7 @@ export const useUpdatePassword = () => {
     },
   });
 
-  return { updatePasswordMutate };
+  return { resetPasswordMutate };
 };
 
 export const useCreateTravelPlanMutate = () => {
@@ -322,24 +314,34 @@ export const useSendOTP = () => {
 };
 
 export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
   const { mutate: updateProfileMutate } = useMutation({
-    mutationFn: async (value: { user_id: string, image: string, bio: string , travel_interests: string, country: string}) => {
+    mutationFn: async (value: { user_id: string, image: string, bio: string , travel_interests: string, country: string, phone_number: string}) => {
       const data = await axiosInstance.post(
         envVars.NEXT_PUBLIC_UPDATE_PROFILE,
         value,
       );
+      if (data?.data?.status === 409) {
+        toast.dismiss();
+        return toast.error(data?.data?.message);
+      }
       if (data?.data?.status >= 400) {
+        toast.dismiss();
         return toast.error("Something went wrong");
       }
       if (data?.data?.status === 200) {
-        return toast.success("Profile updated successfully");
+        toast.dismiss();
+        return toast.success(data?.data?.message);
       }
-      toast.dismiss();
     },
     retry: 1,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getUserFullProfile", "userProfile"] });
+    },
   });
   return { updateProfileMutate };
 };
+
 export const useVerifyOTP = () => {
   const { mutate: verifyOTPMutate } = useMutation({
     mutationFn: async (value: { email: string; otp: string }) => {
@@ -356,3 +358,80 @@ export const useVerifyOTP = () => {
   return { verifyOTPMutate };
 };
 
+export const useUpdatePassword = () => {
+  const { mutate: updatePasswordMutate, isPending } = useMutation({
+    mutationFn: async (value: { password: string}) => {
+      const data = await axiosInstance.put(
+        envVars.NEXT_PUBLIC_UPDATE_PASSWORD,
+        value,
+      );
+      if (data?.data?.data?.status === 422 && data?.data?.data?.message === "Your old password and new password are the same") {
+        return toast.error("Your old password and new password are the same");
+      }
+      if (!data?.data?.data?.success) {
+        return toast.error("Something went wrong");
+      }
+      if (data?.data?.data?.status === 200) {
+        return toast.success(data?.data?.data?.message);
+      }
+    },
+    retry(failureCount) {
+      if (failureCount > 2) {
+        toast.error("Too many attempts. Please try again later");
+        return false;
+      }
+      return true;
+    },
+  });
+
+  return { updatePasswordMutate, isPending };
+};
+
+export const useCreateCheckoutSession = () => {
+  const { mutate: createCheckoutSession, isPending } = useMutation({
+    mutationFn: async (value?: { plan: string }) => {
+      toast.loading("Redirecting to checkout...");
+      const data = await axiosInstance.post(
+        envVars.NEXT_PUBLIC_CREATE_CHECKOUT_SESSION,
+        value || {},
+      );
+      toast.dismiss();
+      if (!data?.data?.success) {
+        return toast.error(data?.data?.message || "Failed to create checkout session");
+      }
+      if (data?.data?.status === 200 && data?.data?.data?.url) {
+        window.location.href = data.data.data.url;
+      }
+    },
+    retry: 0,
+    onError: (error) => {
+      toast.dismiss();
+      toast.error("Failed to initiate checkout");
+      return error;
+    },
+  });
+
+  return { createCheckoutSession, isPending };
+};
+
+export const useConfirmPayment = () => {
+  const { mutate: confirmPaymentMutate, isPending, isSuccess } = useMutation({
+    mutationFn: async (value: { session_id: string, plan: string }) => {
+      const data = await axiosInstance.post(
+        envVars.NEXT_PUBLIC_CONFIRM_PAYMENT,
+        value,
+      );
+      if (!data?.data?.success) {
+         toast.error("Payment confirmation failed");
+         return data;
+      }
+      if (data?.data?.status === 200) {
+         toast.success("Payment confirmed successfully!");
+         return data;
+      }
+    },
+    retry: 0,
+  });
+
+  return { confirmPaymentMutate, isPending, isSuccess };
+};

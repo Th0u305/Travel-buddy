@@ -3,7 +3,7 @@
 import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
 import { Card, CardContent } from "@/src/components/ui/card";
-import { MapPin, Calendar, Loader2 } from "lucide-react";
+import { MapPin, Calendar, Loader2, Phone, SendHorizonal } from "lucide-react";
 import Image from "next/image";
 import {
   useGetUserViewProfile,
@@ -78,7 +78,9 @@ export default function Profile({ id }: { id: string }) {
     );
   }
 
-  const travelInterests = Array.isArray(profile?.travel_interests) ? profile.travel_interests: [];
+  const travelInterests = Array.isArray(profile?.travel_interests)
+    ? profile.travel_interests
+    : [];
 
   return (
     <div className="bg-background text-foreground font-sans antialiased min-h-screen">
@@ -104,10 +106,7 @@ export default function Profile({ id }: { id: string }) {
                     height={200}
                     alt={`Profile of ${profile?.full_name || "User"}`}
                     className="w-full h-full object-cover"
-                    src={
-                      profile?.avatar_url ||
-                      fallbackProfilePic
-                    }
+                    src={profile?.avatar_url || fallbackProfilePic}
                   />
                 </div>
               </div>
@@ -116,19 +115,28 @@ export default function Profile({ id }: { id: string }) {
                 <h1 className="text-white text-4xl md:text-5xl font-extrabold tracking-tight mb-2">
                   {profile?.full_name}
                 </h1>
-                <div className="flex items-center gap-3 text-white/90 font-medium">
-                  {profile?.country && (
-                    <>
-                      <MapPin className="h-4 w-4" />
-                      <span className="text-lg">{profile.country}</span>
-                      <span className="mx-2 opacity-50">•</span>
-                    </>
+                <div className="flex flex-col items-start gap-3 text-white/90 font-medium">
+                  <div>
+                    {profile?.country && (
+                      <>
+                        <MapPin className="h-4 w-4" />
+                        <span className="text-lg">{profile.country}</span>
+                        <span className="mx-2 opacity-50">•</span>
+                      </>
+                    )}
+                    <span className="text-lg">
+                      {profile?.travel_plans?.length} Expeditions
+                    </span>
+                  </div>
+                  {profile?.phone && (
+                    <span className="text-sm flex gap-2">
+                      <Phone className="h-4 w-4" /> Phone number{" "}
+                      {profile?.phone}
+                    </span>
                   )}
-                  <span className="text-lg">
-                    {profile?.travel_plans?.length} Expeditions
-                  </span>
                 </div>
               </div>
+              <Button variant="secondary" size="xl" className="text-black"><SendHorizonal className="fill-white"/> Message</Button>
             </div>
           </div>
         </div>
@@ -205,68 +213,70 @@ export default function Profile({ id }: { id: string }) {
 
                 {profile?.travel_plans?.length > 0 ? (
                   <div className="space-y-6">
-                    {profile?.travel_plans.map((trip: TravelBuddiesTs, i: number) => {
-                      return (
-                        <div
-                          key={i}
-                          className="group relative flex flex-col md:flex-row bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-md border transition-shadow duration-300"
-                        >
-                          <Image
-                            width={500}
-                            height={500}
-                            alt={trip.title}
-                            className={`w-60 h-60 object-cover transition-all duration-500 group-hover:scale-105 ${!profile?.travel_plans[0]?.status ? "grayscale group-hover:grayscale-0" : ""}`}
-                            src={profile?.travel_plans[0]?.image}
-                          />
+                    {profile?.travel_plans.map(
+                      (trip: TravelBuddiesTs, i: number) => {
+                        return (
+                          <div
+                            key={i}
+                            className="group relative flex flex-col md:flex-row bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-md border transition-shadow duration-300"
+                          >
+                            <Image
+                              width={500}
+                              height={500}
+                              alt={trip.title}
+                              className={`w-60 h-60 object-cover transition-all duration-500 group-hover:scale-105 ${!profile?.travel_plans[0]?.status ? "grayscale group-hover:grayscale-0" : ""}`}
+                              src={profile?.travel_plans[0]?.image}
+                            />
 
-                          <div className="flex-1 p-6 flex flex-col justify-between">
-                            <div>
-                              <div className="flex justify-between items-start mb-2">
-                                <Badge
-                                  className={`${profile?.travel_plans[0]?.status === "upcoming" ? "bg-orange-100 text-orange-700 hover:bg-orange-100" : "bg-blue-100 text-blue-700 hover:bg-blue-100"} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border-none`}
-                                >
-                                  {profile?.travel_plans[0]?.status}
-                                </Badge>
-                                <span className="text-muted-foreground text-sm font-medium flex items-center gap-1">
-                                  <Calendar className="h-4 w-4" />
-                                  {formatDate(trip.start_date)} -{" "}
-                                  {formatDate(trip.end_date)}
-                                </span>
+                            <div className="flex-1 p-6 flex flex-col justify-between">
+                              <div>
+                                <div className="flex justify-between items-start mb-2">
+                                  <Badge
+                                    className={`${profile?.travel_plans[0]?.status === "upcoming" ? "bg-orange-100 text-orange-700 hover:bg-orange-100" : "bg-blue-100 text-blue-700 hover:bg-blue-100"} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border-none`}
+                                  >
+                                    {profile?.travel_plans[0]?.status}
+                                  </Badge>
+                                  <span className="text-muted-foreground text-sm font-medium flex items-center gap-1">
+                                    <Calendar className="h-4 w-4" />
+                                    {formatDate(trip.start_date)} -{" "}
+                                    {formatDate(trip.end_date)}
+                                  </span>
+                                </div>
+                                <h4 className="text-xl font-bold mb-2">
+                                  {trip.title}
+                                </h4>
+                                <p className="text-muted-foreground text-sm line-clamp-2">
+                                  {trip.city ? `${trip.city}, ` : ""}
+                                  {trip.country}
+                                  {trip.tags && trip.tags.length > 0
+                                    ? ` • ${trip.tags.join(", ")}`
+                                    : ""}
+                                </p>
                               </div>
-                              <h4 className="text-xl font-bold mb-2">
-                                {trip.title}
-                              </h4>
-                              <p className="text-muted-foreground text-sm line-clamp-2">
-                                {trip.city ? `${trip.city}, ` : ""}
-                                {trip.country}
-                                {trip.tags && trip.tags.length > 0
-                                  ? ` • ${trip.tags.join(", ")}`
-                                  : ""}
-                              </p>
-                            </div>
 
-                            <div className="mt-4 flex items-center justify-between">
-                              <Badge size="lg" variant="secondary">
-                                {trip.travel_type}
-                              </Badge>
+                              <div className="mt-4 flex items-center justify-between">
+                                <Badge size="lg" variant="secondary">
+                                  {trip.travel_type}
+                                </Badge>
 
-                              <Button
-                                onMouseEnter={() => setTripSlug(trip.slug)}
-                                variant={"outline"}
-                                className={`font-bold text-sm rounded-full`}
-                              >
-                                <Link
-                                  prefetch={true}
-                                  href={`/trips/${trip.slug}`}
+                                <Button
+                                  onMouseEnter={() => setTripSlug(trip.slug)}
+                                  variant={"outline"}
+                                  className={`font-bold text-sm rounded-full`}
                                 >
-                                  Details
-                                </Link>
-                              </Button>
+                                  <Link
+                                    prefetch={true}
+                                    href={`/trips/${trip.slug}`}
+                                  >
+                                    Details
+                                  </Link>
+                                </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      },
+                    )}
                   </div>
                 ) : (
                   <div className="p-8 text-center bg-muted/30 rounded-xl border border-dashed text-foreground">

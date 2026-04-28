@@ -67,9 +67,10 @@ import {
 
 export default function TravelPlan() {
   const router = useRouter();
-  const { userData, updateError } = useUserStore();
+  const { userData } = useUserStore();
   const { canCreateTrip } = useCanUserCreateTrip(userData?.data?.id || "");
   const [open, setOpen] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
 
   const originalImage = `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1775166873/cxvbxkhrmc3507c7ubba.avif`;
   const [image, setImage] = useState<string>(originalImage);
@@ -94,17 +95,23 @@ export default function TravelPlan() {
 
   const [searchCountry, setSearchCountry] = useState<string>("");
   const { countries } = useGetCountries(searchCountry);
+  const { userProfileCompleted } = useUserStore();
+  const [updateProfile, setUpdateProfile] = useState<boolean>(false);
 
   useEffect(() => {
-    if (updateError) {
-      toast.error("Please update your profile before creating a travel plan");
-      router.push("/dashboard/profile");
-    }
-    if (!updateError && canCreateTrip > 0) {
+    if (canCreateTrip?.canCreate > 0) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpen(true);
     }
-  }, [canCreateTrip, updateError, router]);
+    if (canCreateTrip?.limitReached >= 5) {
+      setLimitReached(true);
+      setOpen(true);
+    }
+    if (!userProfileCompleted) {
+      setUpdateProfile(true);
+      setOpen(true);
+    }
+  }, [canCreateTrip, userProfileCompleted]);
 
   const form = useForm({
     defaultValues: {
@@ -778,11 +785,18 @@ export default function TravelPlan() {
                 <AlertDialogPopup>
                   <AlertDialogHeader>
                     <AlertDialogTitle className="text-red-500">
-                      You can&apos;t create more trip now
+                      {updateProfile ? "Profile Incomplete" : "Trip Limit Reached"}
                     </AlertDialogTitle>
                     <AlertDialogDescription className="text-md">
-                      Please complete your previous trip before creating a new
-                      one. Or wait for your previous trip time to end.
+                      {updateProfile ? (
+                        "Please complete your profile before creating a new trip"
+                      ) : (
+                        <>
+                          {limitReached
+                            ? "Basic users can only have up to 5 active trips at a time. Please wait for your previous trips to end, or upgrade to the Explorer Pro plan for unlimited trips!"
+                            : "Please complete your previous trip before creating a new trip."}
+                        </>
+                      )}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -792,7 +806,7 @@ export default function TravelPlan() {
                           size="lg"
                           onClick={() => {
                             setOpen(false);
-                            router.push("/");
+                            router.push(updateProfile ? "/dashboard/profile" : "/");
                           }}
                           variant="ghost"
                         />

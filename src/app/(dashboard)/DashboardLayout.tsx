@@ -15,6 +15,11 @@ export default function DashboardLayout() {
   const { userData } = useUserStore();
   const links = [
     {
+      label: "Home",
+      href: "/",
+      icon: <Home className="h-5 w-5 shrink-0 stroke-green-600" />,
+    },
+    {
       label: "Profile",
       href: "/dashboard/profile",
       icon: <User className="h-5 w-5 shrink-0 stroke-blue-600" />,
@@ -28,18 +33,13 @@ export default function DashboardLayout() {
       label: "Settings",
       href: "/dashboard/settings",
       icon: <Settings className="h-5 w-5 shrink-0 stroke-yellow-600" />,
-    },
-    {
-      label: "Home",
-      href: "/",
-      icon: <Home className="h-5 w-5 shrink-0 stroke-green-600" />,
-    },
+    }
   ];
 
   const [open, setOpen] = useState(false);
 
   return (
-    <div>
+    <div className="">
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-1 flex-col pt-10 overflow-x-hidden overflow-y-auto">

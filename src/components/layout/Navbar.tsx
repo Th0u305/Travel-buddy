@@ -16,6 +16,8 @@ import {
   Map,
   BadgeCheck,
   Home,
+  Banknote,
+  Settings,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -52,12 +54,13 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const isHome = location === "/home";
+  const isHome = location === "/home" || location === "/";
 
   const navLinks = [
     { to: "/", label: "Home", icon: Home },
     { to: "/trips", label: "Trips", icon: Map },
     { to: "/findBuddies", label: "Find Travel Buddy", icon: MapPin },
+    { to: "/price", label: "Price", icon: Banknote },
   ];
 
   const logOUtFn = async () => {
@@ -130,7 +133,9 @@ export default function Navbar() {
                       {user?.data?.full_name}
                     </span>
 
-                    <BadgeCheck className="w-5 h-5 text-primary stroke-secondary" />
+                    {user?.data?.subscription_tier === "Premium" && (
+                      <BadgeCheck className="w-5 h-5 text-primary stroke-amber-500" />
+                    )}
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
@@ -150,13 +155,14 @@ export default function Navbar() {
                       <Map className="w-4 h-4" /> My Plans
                     </Link>
                   </DropdownMenuItem>
-                  {/* {isAdmin && (
-                    <DropdownMenuItem>
-                      <Link href="/admin" className="flex items-center gap-2">
-                        <LayoutDashboard className="w-4 h-4" /> Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                  )} */}
+                  <DropdownMenuItem>
+                    <Link
+                      href="/dashboard/settings"
+                      className="flex items-center gap-2"
+                    >
+                      <Settings className="w-4 h-4" /> Settings
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-destructive">
                     <Button

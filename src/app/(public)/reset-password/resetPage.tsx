@@ -12,9 +12,15 @@ import { Field, FieldGroup, FieldLabel } from "@/src/components/ui/field";
 import { Input } from "@/src/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { useForgotPassword } from "@/src/tanstack/useMutation";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useUserStore } from "@/src/store/zustand.store";
 
 const ResetPage = () => {
   const { forgotPasswordMutate } = useForgotPassword();
+  const { userData } = useUserStore();
+  const router = useRouter();
+
   const form = useForm({
     defaultValues: {
       email: "",
@@ -26,6 +32,11 @@ const ResetPage = () => {
       });
     },
   });
+
+  if(!userData?.data?.provider.includes("google")){
+    router.push("/home")
+    return toast.error("You created account the with google login, you can't reset password")
+  }
 
   return (
     <div className="flex flex-col gap-6 justify-center h-screen w-md mx-auto">

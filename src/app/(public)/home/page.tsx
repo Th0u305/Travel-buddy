@@ -102,12 +102,12 @@ export default function HomePage() {
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-white leading-tight">
-              Travel Together,{" "}
+            <h1 className="text-4xl sm:text-5xl font-headline font-extrabold text-white tracking-tight">
+              Travel Together,
               <span className="text-secondary">Explore Forever</span>
             </h1>
 
-            <p className="mt-6 text-lg text-white/75 leading-relaxed max-w-xl">
+            <p className="mt-6 text-lg text-white/75 leading-relaxed max-w-xl font-medium">
               Discover compatible travel companions, share your plans, and
               transform solo journeys into unforgettable shared experiences.
             </p>

@@ -1,11 +1,15 @@
+"use client"
+
 import Link from "next/link";
 import "@/src/css/locationLoader.css";
 import { Button } from "@/src/components/ui/button";
 import { BookOpen, CircleQuestionMark, Home, Users } from "lucide-react";
 import { Input } from "@/src/components/ui/input";
 import { envVars } from "@/src/config/env";
+import { useRouter } from "next/navigation";
 
 export default function NotFound() {
+  const router = useRouter();
   return (
     <main
       className="relative grow flex items-center justify-center h-screen overflow-hidden"
@@ -45,10 +49,10 @@ export default function NotFound() {
 
           {/* Navigation Actions */}
           <div className="flex flex-col sm:flex-row gap-4 w-full justify-evenly">
-            <Button size="xl" className="rounded-full cursor-pointer">
+            <Button onClick={()=>router.push("/home")} variant="default" className="w-[50%] h-15 rounded-full cursor-pointer active:scale-[0.98] transition-all">
               <Home className="mr-2" /> Back to Home
             </Button>
-            <Button size="xl" className="rounded-full cursor-pointer">
+            <Button onClick={()=>router.push("/trips")} variant="default" className="w-[50%] h-15 rounded-full cursor-pointer active:scale-[0.98] transition-all">
               <BookOpen className="mr-2" /> View Journeys
             </Button>
           </div>

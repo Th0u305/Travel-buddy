@@ -20,7 +20,7 @@ import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 import { EyeIcon, EyeOffIcon, SearchIcon } from "lucide-react";
 import Link from "next/link";
-import { useRegister, useGoogleLogin } from "@/src/tanstack/useMutation";
+import { useRegister, useGoogleLogin, useLogout } from "@/src/tanstack/useMutation";
 import { toast } from "sonner";
 import { formSchema } from "@/src/zod/zodValidation";
 import { useUserStore } from "@/src/store/zustand.store";
@@ -56,6 +56,7 @@ export default function RegisterForm() {
   const [searchCountry, setSearchCountry] = useState<string>("");
   const { countries } = useGetCountries(searchCountry);
   const { googleLoginMutate } = useGoogleLogin();
+  const { logoutMutate } = useLogout();
 
   const form = useForm({
     defaultValues: {
@@ -88,6 +89,7 @@ export default function RegisterForm() {
       setIsLoading(true);
       registerMutate(value);
       setIsLoading(false);
+      logoutMutate();
       captchaRef.current?.resetCaptcha();
       setToken(null);
       form.reset();

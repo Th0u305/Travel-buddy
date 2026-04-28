@@ -7,14 +7,6 @@ export async function proxy(request: NextRequest) {
 
   const aaaa = cookie.find((c) => c.value.startsWith("base64-"))?.value;
 
-  const pathname = request.nextUrl.pathname;
-
-  if (pathname === "/auth/reset-password") {
-    const hash = window.location.hash;
-    if (!hash) {
-      return NextResponse.redirect(new URL("/reset-password", request.url));
-    }
-  }
   if (!aaaa) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
@@ -22,5 +14,12 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard", "/profile/:path*"],
+  matcher: [
+    "/dashboard",
+    "/profile/:path*",
+    "/price/confirm-payment/:path*",
+    "/price/cancel-payment",
+    "/price/checkout",
+    "/message/:path*",
+  ],
 };

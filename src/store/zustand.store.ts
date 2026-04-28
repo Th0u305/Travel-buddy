@@ -26,8 +26,8 @@ interface UserStore {
   userFullProfile : FullUserProfile | null
   setUserFullProfile: (userFullProfile: FullUserProfile) => void,
 
-  updateError : boolean
-  setUpdateError: (updateError: boolean) => void,
+  userProfileCompleted : boolean
+  setUserProfileCompleted: (userProfileCompleted: boolean) => void,
 }
 
 
@@ -59,8 +59,8 @@ export const useUserStore = create<UserStore>()(
       userFullProfile : null,
       setUserFullProfile: (userFullProfile: FullUserProfile) => set({ userFullProfile }),
 
-      updateError : false,
-      setUpdateError: (updateError: boolean) => set({ updateError }),
+      userProfileCompleted : false,
+      setUserProfileCompleted: (userProfileCompleted: boolean) => set({ userProfileCompleted }),
     }),
     {
       name: "hello-world",
@@ -68,17 +68,20 @@ export const useUserStore = create<UserStore>()(
       partialize: () => ({}),
       onRehydrateStorage : ()=> (state) => {
         if (state?.userData) {
-          if(!state?.userData?.data?.avatar_url){
-            state?.setUpdateError(true)
-          }else{
-            state?.setUpdateError(false)
-          }
           state?.setIsLoggedIn(true);
         }else{
-          state?.setUpdateError(false)
           state?.setIsLoggedIn(false)
           state?.removeUserData()
           state?.setHasHydrated(true);
+        }
+        if(state?.userFullProfile){
+          if (!state?.userFullProfile?.bio || !state?.userFullProfile?.avatar_url || !state?.userFullProfile?.country || !state?.userFullProfile?.travel_interests || !state?.userFullProfile?.phone) {
+            state?.setUserProfileCompleted(true);
+          }else{
+            state?.setUserProfileCompleted(false)
+          }
+        }else{
+          state?.setUserProfileCompleted(false)
         }
       },
     },

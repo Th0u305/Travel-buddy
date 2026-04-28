@@ -3,26 +3,23 @@
 import { useEffect } from "react";
 import Footer from "@/src/components/layout/Footer";
 import Navbar from "@/src/components/layout/Navbar";
-import { useGetUserProfile } from "@/src/tanstack/useQuery";
-import UpdateUserError from "@/src/components/layout/UpdateUserError";
-import { useUserStore } from "@/src/store/zustand.store";
-// import Loading from "@/src/components/loading";
-// import { useUserStore } from "@/src/store/zustand.store";
+import { useGetUserFullProfile, useGetUserProfile } from "@/src/tanstack/useQuery";
+import Loading from "@/src/components/loading";
 
 export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { userProfileRefetch } = useGetUserProfile();
-  const updateError = useUserStore((state) => state.updateError);
-  // const hasHydrated = useUserStore((state) => state.hasHydrated);
+  const { userProfileRefetch, isLoading } = useGetUserProfile();
+  const { getUserFullProfileRefetch } = useGetUserFullProfile();
 
   useEffect(() => {
     userProfileRefetch();
-  }, [userProfileRefetch]);
+    getUserFullProfileRefetch();
+  }, [userProfileRefetch, getUserFullProfileRefetch]);
 
-  // if (!hasHydrated) {
+  // if (isLoading) {
   //   return (
   //     <div className="flex items-center justify-center h-screen bg-[#212121]">
   //       <Loading />
@@ -32,11 +29,6 @@ export default function PublicLayout({
 
   return (
     <div className="relative">
-      {updateError && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-10">
-          <UpdateUserError />
-        </div>
-      )}
       <Navbar />
       {children}
       <Footer />
