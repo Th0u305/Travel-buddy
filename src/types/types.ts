@@ -60,6 +60,7 @@ export interface TravelListTs {
   profiles: SmallProfile;
   slug: string;
   participantsId: string[];
+  participants_info: { avatar_url: string | null; username_slug: string | null }[];
 }
 export interface SmallProfile {
   id: string;
@@ -72,9 +73,7 @@ export interface SmallProfile {
   subscription_tier: string | null;
   subscription_plan: string | null;
   subscription_expires_at: Date | null;
-}
-export interface SmallProfileZustand {
-  data: SmallProfile;
+  is_profile_completed: boolean;
 }
 
 export interface TravelBuddiesTs {

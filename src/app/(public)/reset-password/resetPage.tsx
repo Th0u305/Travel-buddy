@@ -33,7 +33,7 @@ const ResetPage = () => {
     },
   });
 
-  if(!userData?.data?.provider.includes("google")){
+  if(!userData?.provider?.includes("google")){
     router.push("/home")
     return toast.error("You created account the with google login, you can't reset password")
   }

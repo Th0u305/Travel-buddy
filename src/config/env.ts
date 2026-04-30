@@ -29,6 +29,8 @@ interface EnvConfig {
     NEXT_PUBLIC_UPDATE_PASSWORD : string;
     NEXT_PUBLIC_CREATE_CHECKOUT_SESSION: string;
     NEXT_PUBLIC_CONFIRM_PAYMENT: string;
+    NEXT_PUBLIC_JOIN_TRIP : string;
+    NEXT_PUBLIC_REMOVE_FROM_TRIP : string;
 }
 
 
@@ -63,7 +65,9 @@ const loadEnvVariables = (): EnvConfig => {
         "NEXT_PUBLIC_FORGOT_PASSWORD_SESSION_EXCHANGE",
         "NEXT_PUBLIC_UPDATE_PASSWORD",
         "NEXT_PUBLIC_CREATE_CHECKOUT_SESSION",
-        "NEXT_PUBLIC_CONFIRM_PAYMENT"
+        "NEXT_PUBLIC_CONFIRM_PAYMENT",
+        "NEXT_PUBLIC_JOIN_TRIP",
+        "NEXT_PUBLIC_REMOVE_FROM_TRIP"
     ]
 
     requireEnvVariable.forEach((variable) => {
@@ -104,6 +108,8 @@ const loadEnvVariables = (): EnvConfig => {
         NEXT_PUBLIC_UPDATE_PASSWORD: process.env.NEXT_PUBLIC_UPDATE_PASSWORD as string,
         NEXT_PUBLIC_CREATE_CHECKOUT_SESSION: process.env.NEXT_PUBLIC_CREATE_CHECKOUT_SESSION as string,
         NEXT_PUBLIC_CONFIRM_PAYMENT: process.env.NEXT_PUBLIC_CONFIRM_PAYMENT as string,
+        NEXT_PUBLIC_JOIN_TRIP: process.env.NEXT_PUBLIC_JOIN_TRIP as string,
+        NEXT_PUBLIC_REMOVE_FROM_TRIP: process.env.NEXT_PUBLIC_REMOVE_FROM_TRIP as string,
     }
 }
 

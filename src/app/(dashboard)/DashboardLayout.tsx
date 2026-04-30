@@ -53,12 +53,12 @@ export default function DashboardLayout() {
           <div>
             <SidebarLink
               link={{
-                label: userData?.data?.full_name || "",
+                label: userData?.full_name || "",
                 href: "/home",
                 icon: (
                   <Image
                     src={
-                      userData?.data?.avatar_url ||
+                      userData?.avatar_url ||
                       "https://res.cloudinary.com/jingalahuhu69/image/upload/v1776234313/wzzrakohxs76t6qygogb.png"
                     }
                     className="h-7 w-7 shrink-0 rounded-full"

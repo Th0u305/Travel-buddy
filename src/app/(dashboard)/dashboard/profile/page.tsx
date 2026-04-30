@@ -15,6 +15,7 @@ import {
   MessageSquareWarning,
   SearchIcon,
   User,
+  XCircleIcon,
 } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import FileUploader from "@/src/utils/fileUploader";
@@ -36,8 +37,8 @@ import { SelectButton } from "@/src/components/ui/select";
 import { useUserStore } from "@/src/store/zustand.store";
 
 export default function ProfilePage() {
-  const { isLoading, getUserFullProfileRefetch } = useGetUserFullProfile();
-  const { userFullProfile } = useUserStore();
+  const { isLoading } = useGetUserFullProfile();
+  const userFullProfile = useUserStore((state) => state.userFullProfile);
   const [image, setImage] = useState<string>(userFullProfile?.avatar_url || "");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [resetForm, setResetForm] = useState<boolean>(false);
@@ -59,7 +60,23 @@ export default function ProfilePage() {
 
   const travelInterests = Array.isArray(userFullProfile?.travel_interests)
     ? userFullProfile?.travel_interests
-    : userFullProfile?.travel_interests || "";
+    : userFullProfile?.travel_interests ? [userFullProfile?.travel_interests] : [];
+
+  const handleRemoveInterest = (interestToRemove: string) => {
+    toast.loading("Removing interest...");
+    const existing: string[] = Array.isArray(userFullProfile?.travel_interests) ? userFullProfile.travel_interests : [];
+    const updatedInterests = existing.filter((i: string) => i !== interestToRemove);
+    const interestsString = updatedInterests.length > 0 ? updatedInterests.join(", ") : "clear_all";
+
+    updateProfileMutate({
+      user_id: userFullProfile?.id || "",
+      image: "",
+      bio: "",
+      travel_interests: interestsString,
+      country: "",
+      phone_number: "",
+    });
+  };
 
   const form = useForm({
     defaultValues: {
@@ -99,7 +116,6 @@ export default function ProfilePage() {
         formData.append("upload_preset", "travel_plan");
         formData.append("cloud_name", envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME);
       }
-      toast.loading("Updating profile...");
       try {
         let data = "";
 
@@ -123,11 +139,25 @@ export default function ProfilePage() {
           }
         }
 
+        const existingInterests: string[] = Array.isArray(userFullProfile?.travel_interests) ? userFullProfile.travel_interests : [];
+        const newInterests = value.travel_interests ? value.travel_interests.split(",").map((i: string) => i.trim()).filter((i: string) => i) : [];
+        
+        const duplicate = newInterests.find((p: string) => existingInterests.includes(p));
+        if (duplicate) {
+          toast.dismiss();
+          return toast.error(`Travel interest '${duplicate}' already exists`);
+        }
+        
+        let mergedInterests = "";
+        if (newInterests.length > 0) {
+           mergedInterests = [...existingInterests, ...newInterests].join(", ");
+        }
+
         updateProfileMutate({
           user_id: userFullProfile?.id || "",
           image: data || "",
           bio: value.bio,
-          travel_interests: value.travel_interests,
+          travel_interests: mergedInterests,
           country: value.country,
           phone_number: value.phone_number,
         });
@@ -139,9 +169,6 @@ export default function ProfilePage() {
           mutateOptimisticImageFile(null);
         });
         userProfileRefetch();
-        getUserFullProfileRefetch();
-        window.location.reload();
-        toast.dismiss();
         form.reset();
         return;
       } catch {
@@ -160,9 +187,9 @@ export default function ProfilePage() {
       ) : (
         <>
           <div className="flex flex-col">
-            <h2 className="text-2xl font-headline font-extrabold text-on-surface tracking-tight mb-2">
+            <h1 className="text-4xl font-headline font-extrabold text-on-surface tracking-tight">
               Welcome back {userFullProfile?.full_name || "Unknown User"}
-            </h2>
+            </h1>
             <p className="text-on-surface-variant font-medium text-lg">
               Your next adventure awaits
             </p>
@@ -280,65 +307,69 @@ export default function ProfilePage() {
                     </div>
                   )}
 
-                  <Field className="m-1">
-                    <FieldLabel
-                      className="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider"
-                      htmlFor="country"
-                    >
-                      Country
-                    </FieldLabel>
-                    <form.Field name="country">
-                      {(field) => {
-                        return (
-                          <Combobox
-                            items={countries}
-                            onValueChange={(e) => {
-                              field.handleChange(e as string);
-                            }}
-                            value={field.state.value}
-                          >
-                            <ComboboxTrigger
-                              className="h-15 bg-[#dfe4dd]"
-                              render={<SelectButton />}
+                  {!userFullProfile?.country && (
+                    <Field className="m-1">
+                      <FieldLabel
+                        className="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider"
+                        htmlFor="country"
+                      >
+                        Country
+                      </FieldLabel>
+                      <form.Field name="country">
+                        {(field) => {
+                          return (
+                            <Combobox
+                              items={countries}
+                              onValueChange={(e) => {
+                                field.handleChange(e as string);
+                              }}
+                              value={field.state.value}
                             >
-                              <ComboboxValue placeholder="Select a country" />
-                            </ComboboxTrigger>
-                            <ComboboxPopup
-                              aria-label="Select a country"
-                              className="w-1/2"
-                            >
-                              <div className="border-b p-2">
-                                <ComboboxInput
-                                  className="rounded-md before:rounded-[calc(var(--radius-md)-1px)] pl-8"
-                                  placeholder="Search countries..."
-                                  showTrigger={false}
-                                  startAddon={<SearchIcon />}
-                                  onChange={(e) =>
-                                    setSearchCountry(e.target.value)
-                                  }
-                                />
-                              </div>
-                              <ComboboxEmpty>No countries found.</ComboboxEmpty>
-                              <ComboboxList>
-                                {countries?.length > 0 ? (
-                                  (item) => (
-                                    <ComboboxItem
-                                      key={item.iso2}
-                                      value={item.name}
-                                    >
-                                      {item.name}
-                                    </ComboboxItem>
-                                  )
-                                ) : (
-                                  <Spinner className="w-8 h-8 text-blue-500" />
-                                )}
-                              </ComboboxList>
-                            </ComboboxPopup>
-                          </Combobox>
-                        );
-                      }}
-                    </form.Field>
-                  </Field>
+                              <ComboboxTrigger
+                                className="h-15 bg-[#dfe4dd]"
+                                render={<SelectButton />}
+                              >
+                                <ComboboxValue placeholder="Select a country" />
+                              </ComboboxTrigger>
+                              <ComboboxPopup
+                                aria-label="Select a country"
+                                className="w-1/2"
+                              >
+                                <div className="border-b p-2">
+                                  <ComboboxInput
+                                    className="rounded-md before:rounded-[calc(var(--radius-md)-1px)] pl-8"
+                                    placeholder="Search countries..."
+                                    showTrigger={false}
+                                    startAddon={<SearchIcon />}
+                                    onChange={(e) =>
+                                      setSearchCountry(e.target.value)
+                                    }
+                                  />
+                                </div>
+                                <ComboboxEmpty>
+                                  No countries found.
+                                </ComboboxEmpty>
+                                <ComboboxList>
+                                  {countries?.length > 0 ? (
+                                    (item) => (
+                                      <ComboboxItem
+                                        key={item.iso2}
+                                        value={item.name}
+                                      >
+                                        {item.name}
+                                      </ComboboxItem>
+                                    )
+                                  ) : (
+                                    <Spinner className="w-8 h-8 text-blue-500" />
+                                  )}
+                                </ComboboxList>
+                              </ComboboxPopup>
+                            </Combobox>
+                          );
+                        }}
+                      </form.Field>
+                    </Field>
+                  )}
 
                   {!userFullProfile?.avatar_url && (
                     <div>
@@ -473,13 +504,14 @@ export default function ProfilePage() {
                           interests
                         </p>
                       ) : (
-                        <>
-                          <span>
-                            <span className="material-symbols-outlined text-sm">
-                              {travelInterests}
-                            </span>
-                          </span>
-                        </>
+                        travelInterests.map((interest: string, idx: number) => (
+                          <p key={idx}
+                            className="text-black flex items-center gap-1 relative bg-secondary p-2 rounded-full text-sm"
+                          >
+                            {interest}
+                          <XCircleIcon onClick={() => handleRemoveInterest(interest)} className="text-red-500 bg-white rounded-full outline-0 border-0 p-0 w-5 h-5 cursor-pointer absolute left-31 bottom-6" />
+                          </p>
+                        ))
                       )}
                     </div>
                     {/* Travel Interests - Editable */}

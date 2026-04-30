@@ -26,22 +26,30 @@ import {
 export default function PricingAndCheckout() {
   const [isAnnual, setIsAnnual] = useState(true);
   const router = useRouter();
-  const { userData, userProfileCompleted } = useUserStore();
+  const { userData } = useUserStore();
   const [open, setOpen] = useState(false);
 
   const handlePrice = () => {
+    if (!userData) {
+      return toast.error("Please login to continue");
+    }
 
-    if (userData && !userProfileCompleted) {
+    if (!userData?.is_profile_completed) {
       return setOpen(true);
     }
 
-    if (!userData) {
-      return toast.error("Please login to continue");
-    } else {
-      return router.push(
-        `/price/checkout?plan=${isAnnual ? "annual" : "monthly"}`,
-      );
+    if (userData.subscription_tier && userData.subscription_expires_at) {
+      const expiryDate = new Date(userData.subscription_expires_at);
+      const today = new Date();
+      if (expiryDate.getTime() > today.getTime()) {
+        toast.dismiss();
+        return toast.error("You already have an active subscription.");
+      }
     }
+
+    return router.push(
+      `/price/checkout?plan=${isAnnual ? "annual" : "monthly"}`,
+    );
   };
 
   return (

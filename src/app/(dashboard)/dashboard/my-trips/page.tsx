@@ -32,7 +32,7 @@ const StatItem = ({
 
 export default function MyTripsDashboard() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const { userFullProfile } = useUserStore();
+  const userFullProfile = useUserStore((state) => state.userFullProfile);
   useGetTravelListById(hoveredId || "");
   const router = useRouter();
 
@@ -41,7 +41,7 @@ export default function MyTripsDashboard() {
       {/* Page Header & Tabs */}
       <div className="flex flex-col gap-6">
         <div className="flex justify-between items-end">
-          <h1 className="text-4xl sm:text-5xl font-headline font-extrabold text-on-surface tracking-tight">
+          <h1 className="text-4xl font-headline font-extrabold text-on-surface tracking-tight">
             My Trips
           </h1>
         </div>
@@ -64,7 +64,7 @@ export default function MyTripsDashboard() {
       </div>
 
       <div className="flex w-full flex-row-reverse gap-3 items-end justify-end">
-        <div className="bg-gray-200 rounded-3xl p-6 flex flex-col gap-1.5 h-fit">
+        <div className="bg-gray-200 rounded-3xl p-6 flex flex-col gap-1.5 h-full">
           {/* User Profile Header */}
           <div className="flex items-center gap-4 overflow-hidden">
             <Image
@@ -82,7 +82,7 @@ export default function MyTripsDashboard() {
               <h3 className="font-headline font-bold text-lg text-on-surface">
                 {userFullProfile?.full_name || "Unknown User"}
               </h3>
-              <p className="text-xs font-body truncate">
+              <p className="text-xs font-body truncate max-w-35">
                 {userFullProfile?.bio || "Global Nomad"}
               </p>
             </div>

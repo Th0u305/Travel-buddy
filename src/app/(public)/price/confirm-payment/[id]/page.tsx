@@ -102,7 +102,7 @@ const Page = () => {
               Total Billed
             </span>
             <span className="font-headline font-bold text-on-surface">
-              $120.00{" "}
+              $120.00
               <span className="text-xs font-normal text-on-surface-variant">
                 / yr
               </span>

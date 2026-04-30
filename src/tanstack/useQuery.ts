@@ -7,47 +7,28 @@ import { useUserStore } from "../store/zustand.store";
 import { toast } from "sonner";
 
 export function useGetUserProfile() {
-  // const queryClient = useQueryClient()
-  // const userData = queryClient.getQueryData(["userProfile"])
 
   const { setUserData } = useUserStore();
 
-  const {
-    data: user,
-    refetch: userProfileRefetch,
-    isLoading,
-  } = useQuery({
-    queryKey: ["userProfile"],
+  const { data: user,refetch: userProfileRefetch,isLoading } = useQuery({
+  queryKey: ["userProfile"],
     queryFn: async () => {
       const res = await axiosInstance.get(envVars.NEXT_PUBLIC_GET_USER);
-      setUserData(res?.data?.data);
+      setUserData(res?.data?.data?.data);
       return res?.data?.data;
     },
-    // placeholderData : userData,
-    // initialData : keepPreviousData,
-    // refetchOnMount : true,
-    // staleTime : 1000 * 60 * 5,
     enabled: true,
     retry: 1,
   });
 
-  // useEffect(()=>{
-  //     if (userData) {
-  //         setUserData(userData as UserTs)
-  //     }
-  //     setUserData(user as UserTs)
-  // },[userData, setUserData, user])
   return { userProfileRefetch, isLoading, user };
 }
 
-export function useGetTravelListsByPagination(
-  page: number,
-  searchQuery: string,
-  travelType: string,
-) {
+export function useGetTravelListsByPagination(page: number,searchQuery: string,travelType: string) {
+
   const { setTravelLists } = useUserStore();
   const { refetch: travelListsRefetch, isLoading } = useQuery({
-    queryKey: ["travelLists", page, searchQuery, travelType],
+  queryKey: ["travelLists", page, searchQuery, travelType],
     queryFn: async () => {
       const res = await axiosInstance.get(
         envVars.NEXT_PUBLIC_GET_TRAVEL_LISTS +
@@ -66,15 +47,12 @@ export function useGetTravelListsByPagination(
 }
 
 export function useGetTravelListById(id: string) {
+  
   const { setSingleTravelList } = useUserStore();
 
-  const {
-    data: travelList,
-    refetch: travelListRefetch,
-    isLoading,
-  } = useQuery({
-    queryKey: ["singleTravelList", id],
-    queryFn: async () => {
+  const { data: travelList,refetch: travelListRefetch,isLoading } = useQuery({
+  queryKey: ["singleTravelList", id],
+  queryFn: async () => {
       const res = await axiosInstance.get(
         envVars.NEXT_PUBLIC_GET_TRAVEL_LISTS_BY_ID + `/${id}`,
       );
@@ -83,11 +61,8 @@ export function useGetTravelListById(id: string) {
       }
       setSingleTravelList(res?.data?.data);
       return res?.data?.data;
-    },
-    retry: 1,
-    enabled: id?.length > 0 ? true : false,
-    staleTime: 1000 * 6 * 5,
-    gcTime: 1000 * 6 * 5,
+  },
+    retry: 1
   });
 
   return { travelListRefetch, isLoading, travelList };

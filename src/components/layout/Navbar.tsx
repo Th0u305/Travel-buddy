@@ -99,7 +99,7 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          {user?.data?.email && user?.data?.full_name && (
+          {user?.email && user?.full_name && (
             <Link
               href="/create-travel-plan"
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -121,19 +121,19 @@ export default function Navbar() {
                 <DropdownMenuTrigger>
                   <div className="border hover:border-primary flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-primary transition-colors cursor-pointer">
                     <Avatar className="w-8 h-8">
-                      <AvatarImage src={user?.data?.avatar_url || "#"} />
+                      <AvatarImage src={user?.avatar_url || "#"} />
                       <AvatarFallback className="bg-background text-primary text-xs font-semibold">
-                        {user?.data?.full_name?.charAt(0)?.toUpperCase()}
+                        {user?.full_name?.charAt(0)?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
 
                     <span
                       className={`text-sm font-medium ${!scrolled && isHome ? "text-white" : "text-foreground"}`}
                     >
-                      {user?.data?.full_name}
+                      {user?.full_name}
                     </span>
 
-                    {user?.data?.subscription_tier === "Premium" && (
+                    {user?.subscription_tier === "Premium" && (
                       <BadgeCheck className="w-5 h-5 text-primary stroke-amber-500" />
                     )}
                   </div>
@@ -229,7 +229,7 @@ export default function Navbar() {
                         {link.label}
                       </Link>
                     ))}
-                    {user?.data?.email && user?.data?.full_name && (
+                    {user?.email && user?.full_name && (
                       <Link
                         href="/create-travel-plan"
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
@@ -251,17 +251,17 @@ export default function Navbar() {
                           className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted"
                         >
                           <Avatar className="w-8 h-8">
-                            <AvatarImage src={user?.data?.avatar_url || "#"} />
+                            <AvatarImage src={user?.avatar_url || "#"} />
                             <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                              {user?.data?.full_name?.charAt(0)?.toUpperCase()}
+                              {user?.full_name?.charAt(0)?.toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <p className="text-sm font-medium">
-                              {user?.data?.full_name}
+                              {user?.full_name}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {user?.data?.email}
+                              {user?.email}
                             </p>
                           </div>
                         </Link>

@@ -263,19 +263,22 @@ export const useResetPassword = () => {
 
 export const useCreateTravelPlanMutate = () => {
   const queryClient = useQueryClient();
+  const {setSingleTravelList} = useUserStore()
 
   const { mutate: createTravelPlan } = useMutation({
     mutationFn: async (value: CreateTravelPlanTs) => {
+      toast.loading("Creating travel plan...")
       const data = await axiosInstance.post(
         envVars.NEXT_PUBLIC_CREATE_TRAVEL_PLAN,
         value,
       );
-
+      toast.dismiss()
       if (data?.data?.status >= 400) {
         return toast.error("Something went wrong");
       }
       if (data?.data?.status === 200) {
-        return toast.success("Travel plan created successfully");
+        setSingleTravelList(data?.data?.data);
+        return toast.success(data?.data?.message);
       }
     },
     retry(failureCount) {
@@ -297,6 +300,85 @@ export const useCreateTravelPlanMutate = () => {
   return { createTravelPlan };
 };
 
+export const useJoinTrip = () =>{
+  const queryClient = useQueryClient();
+  const {setSingleTravelList} = useUserStore();
+
+  const { mutate: joinTrip } = useMutation({
+    mutationFn: async (value: {slug: string , userId: string}) => {
+      toast.loading("Joining trip...")
+      const data = await axiosInstance.post(
+        envVars.NEXT_PUBLIC_JOIN_TRIP,
+        value,
+      );
+      toast.dismiss()
+      if (data?.data?.status === 400) {
+        return toast.error(data?.data?.message);
+      }
+      if (data?.data?.status > 400) {
+        return toast.error("Something went wrong");
+      }
+      if (data?.data?.status === 200) {
+        setSingleTravelList(data?.data?.data)
+        return toast.success(data?.data?.message);
+      }
+    },
+    retry(failureCount) {
+      if (failureCount > 1) {
+        toast.error("Too many attempts. Please try again later");
+        return false;
+      }
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["travelLists", "singleTravelList"] });
+    },
+    onError: (error) => {
+      return error;
+    }
+  });
+
+  return { joinTrip }
+}
+
+export const useRemoveFromTrip = () =>{
+  const queryClient = useQueryClient();
+  const {setSingleTravelList} = useUserStore();
+
+  const { mutate: removeFromTrip } = useMutation({
+    mutationFn: async (value: {slug: string , userId: string}) => {
+      toast.loading("Leaving trip...")
+      const data = await axiosInstance.post(envVars.NEXT_PUBLIC_REMOVE_FROM_TRIP, value);
+      toast.dismiss()
+      if (data?.data?.status === 400) {
+        return toast.error(data?.data?.message);
+      }
+      if (data?.data?.status > 400) {
+        return toast.error("Something went wrong");
+      }
+      if (data?.data?.status === 200) {
+        setSingleTravelList(data?.data?.data);
+        return toast.success(data?.data?.message);
+      }
+    },
+    retry(failureCount) {
+      if (failureCount > 1) {
+        toast.error("Too many attempts. Please try again later");
+        return false;
+      }
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["travelLists", "singleTravelList"] });
+    },
+    onError: (error) => {
+      return error;
+    }
+  });
+
+  return { removeFromTrip }
+}
+
 export const useSendOTP = () => {
   const { mutate: sendOTPMutate } = useMutation({
     mutationFn: async (value: { email: string }) => {
@@ -314,23 +396,26 @@ export const useSendOTP = () => {
 };
 
 export const useUpdateProfile = () => {
+
   const queryClient = useQueryClient();
+  const {setUserFullProfile} = useUserStore();
+
   const { mutate: updateProfileMutate } = useMutation({
     mutationFn: async (value: { user_id: string, image: string, bio: string , travel_interests: string, country: string, phone_number: string}) => {
+      toast.loading("Updating profile...")
       const data = await axiosInstance.post(
         envVars.NEXT_PUBLIC_UPDATE_PROFILE,
         value,
       );
+      toast.dismiss();
       if (data?.data?.status === 409) {
-        toast.dismiss();
         return toast.error(data?.data?.message);
       }
       if (data?.data?.status >= 400) {
-        toast.dismiss();
         return toast.error("Something went wrong");
       }
       if (data?.data?.status === 200) {
-        toast.dismiss();
+        setUserFullProfile(data?.data?.data);
         return toast.success(data?.data?.message);
       }
     },

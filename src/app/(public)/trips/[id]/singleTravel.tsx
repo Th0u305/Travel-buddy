@@ -1,6 +1,5 @@
 "use client";
 
-import Loading from "@/src/components/loading";
 import { Button } from "@/src/components/ui/button";
 import {
   Timeline,
@@ -24,14 +23,21 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useGetTravelListById } from "@/src/tanstack/useQuery";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useUserStore } from "@/src/store/zustand.store";
+import { useJoinTrip, useRemoveFromTrip } from "@/src/tanstack/useMutation";
+import { toast } from "sonner";
 
 const SingleTravel = ({ id }: { id: string }) => {
   const { id: paramsId } = useParams();
 
-  const { travelList, isLoading } = useGetTravelListById(
-    id ? id : (paramsId as string),
-  );
+  useGetTravelListById(id ? id : (paramsId as string));
+  const userData = useUserStore((state) => state.userData);
+  const travelList = useUserStore((state) => state.singleTravelList);
+
+  const { joinTrip } = useJoinTrip();
+
+  const router = useRouter();
 
   const calculateDuration = () => {
     if (!travelList) return 0;
@@ -40,6 +46,30 @@ const SingleTravel = ({ id }: { id: string }) => {
     const diffTime = Math.abs(Number(endDate) - Number(startDate));
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
+  };
+
+  const { removeFromTrip } = useRemoveFromTrip();
+console.log(travelList);
+  const isUserJoined =
+    userData?.id && travelList?.participantsId?.includes(userData?.id);
+
+  const handleJoinTrip = async () => {
+    if (!userData) {
+      toast.error("Please login to join the trip");
+      toast.dismiss();
+      router.push("/login");
+      return;
+    }
+    if (isUserJoined) {
+      return removeFromTrip({
+        slug: id ? id : (paramsId as string),
+        userId: userData?.id,
+      });
+    }
+    return joinTrip({
+      slug: id ? id : (paramsId as string),
+      userId: userData?.id,
+    });
   };
 
   const orderStatus = [
@@ -66,42 +96,6 @@ const SingleTravel = ({ id }: { id: string }) => {
     },
   ];
 
-  const imageList = [
-    {
-      id: 1,
-      src: `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1776234313/ughr5xdhrc1x7yvgj2va.png`,
-      alt: "middle-aged man with graying hair in a professional outdoor photo",
-    },
-    {
-      id: 2,
-      src: `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1776234313/oxpuatb74h7lpaisxdh3.png`,
-      alt: "portrait of a man with sunglasses and an outdoor hat smiling in bright sunlight",
-    },
-    {
-      id: 3,
-      src: `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1776225555/fytplzipunjeg6kkgejo.png`,
-      alt: "woman in hiking gear standing on a rock overlooking a valley",
-    },
-    {
-      id: 4,
-      src: `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1776234313/wzzrakohxs76t6qygogb.png`,
-      alt: "vibrant portrait of a woman with curly hair laughing outdoors",
-    },
-    {
-      id: 5,
-      src: `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1776234313/hif3inrvpfeidwgkhwiy.png`,
-      alt: "happy young man in a yellow raincoat in a misty forest",
-    },
-    {
-      id: 6,
-      src: `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1776234313/urutbci05huidgn3t4jn.png`,
-      alt: "profile of a woman with braided hair looking at a mountain range",
-    },
-  ];
-
-  if (isLoading) {
-    return <Loading />;
-  }
 
   return (
     <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 space-y-12 mt-20">
@@ -113,7 +107,7 @@ const SingleTravel = ({ id }: { id: string }) => {
           height={1080}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           data-alt="dramatic wide angle shot of snowy jagged mountain peaks in Patagonia at sunrise with golden light reflecting on a calm turquoise lake in the foreground"
-          src={travelList?.image}
+          src={travelList?.image || ""}
           alt="Patagonia landscape"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -133,7 +127,7 @@ const SingleTravel = ({ id }: { id: string }) => {
             <div className="flex items-center gap-6 text-white/90 font-medium">
               <p className="flex flex-row items-center gap-2">
                 <CalendarIcon className="stroke-blue-500" />
-                {travelList?.start_date?.split("T")[0]} -{" "}
+                {travelList?.start_date?.split("T")[0]} -
                 {travelList?.end_date?.split("T")[0]}
               </p>
               <p className="flex flex-row items-center gap-2">
@@ -143,8 +137,19 @@ const SingleTravel = ({ id }: { id: string }) => {
             </div>
           </div>
           <div className="shrink-0">
-            <Button className="text-white px-12 py-5 rounded-full font-bold text-lg hover:scale-105 active:scale-95 transition-all">
-              Join Trip
+            <Button
+              variant={isUserJoined ? "destructive" : "default"}
+              onClick={() => handleJoinTrip()}
+              disabled={travelList?.travel_type === "Solo" && !isUserJoined}
+              className="disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 text-white px-12 py-5 rounded-full font-bold text-lg hover:scale-105 active:scale-95 transition-all"
+            >
+              {userData?.id === travelList?.user_id
+                ? "Edit Trip"
+                : isUserJoined
+                  ? "Leave Trip"
+                  : travelList?.travel_type === "Solo"
+                    ? `Solo Trip`
+                    : `Join Trip`}
             </Button>
           </div>
         </div>
@@ -224,11 +229,11 @@ const SingleTravel = ({ id }: { id: string }) => {
               </p>
               <p className="text-xl font-bold flex items-center gap-2">
                 {travelList?.travel_type.toLowerCase() === "couple" ? (
-                  <Heart className="fill-red-500 w-4 h-4" />
+                  <Heart className="fill-red-500 w-6 h-6" />
                 ) : travelList?.travel_type.toLowerCase() === "solo" ? (
-                  <User className="fill-blue-500 w-4 h-4" />
+                  <User className="fill-blue-500 w-6 h-6" />
                 ) : (
-                  <Users className="fill-green-500 w-4 h-4" />
+                  <Users className="fill-green-500 w-6 h-6" />
                 )}
                 {travelList?.travel_type}
               </p>
@@ -245,7 +250,6 @@ const SingleTravel = ({ id }: { id: string }) => {
             className="w-32 h-32 rounded-full border-4 border-white shadow-lg mb-6 object-cover"
             data-alt="smiling woman with brown hair in outdoor gear with blurred mountain background"
             src={
-              travelList?.profiles?.profile_picture ||
               travelList?.profiles?.avatar_url ||
               `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1776225555/fytplzipunjeg6kkgejo.png`
             }
@@ -295,7 +299,7 @@ const SingleTravel = ({ id }: { id: string }) => {
                       <Image
                         loading="eager"
                         className="w-full h-48 object-cover rounded-xl mt-4"
-                        src={travelList?.image}
+                        src={travelList?.image || ""}
                         alt="a"
                         width={1000}
                         height={1000}
@@ -319,26 +323,30 @@ const SingleTravel = ({ id }: { id: string }) => {
             <h3 className="text-2xl font-bold mb-6 flex justify-between items-center">
               Joined Buddies
               <span className="text-sm font-medium text-secondary">
-                {travelList?.max_buddies - (travelList?.max_buddies - 1)} /
-                {travelList?.max_buddies - 1} Spots
+                {travelList?.participantsId?.length} / {travelList?.max_buddies}{" "}
+                Spots
               </span>
             </h3>
             <div className="grid grid-cols-4 gap-4">
-              {imageList?.map((item) => (
+              {travelList?.participants_info?.map((item, idx) => (
                 <Image
+                  onClick={() => router.push(`/profile/${item.username_slug}`)}
                   loading="eager"
-                  key={item.id}
-                  className="w-full aspect-square rounded-2xl object-cover hover:scale-105 transition-transform"
-                  data-alt={item.alt}
-                  src={item.src}
-                  alt={item.alt}
+                  key={idx}
+                  className="w-full aspect-square rounded-2xl object-cover hover:scale-105 transition-transform cursor-pointer"
+                  data-alt={item.username_slug || "user profile image"}
+                  src={
+                    item.avatar_url ||
+                    `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1776234313/ughr5xdhrc1x7yvgj2va.png`
+                  }
+                  alt={item.username_slug || "user profile image"}
                   width={100}
                   height={100}
                 />
               ))}
-              <div className="w-full aspect-square rounded-2xl bg-surface-container-highest flex items-center justify-center text-outline-variant font-bold text-lg">
-                +{travelList?.max_buddies - 1}
-              </div>
+              {/* <div className="w-full aspect-square rounded-2xl bg-surface-container-highest flex items-center justify-center text-outline-variant font-bold text-lg">
+                +{travelList?.participantsId.length}
+              </div> */}
             </div>
             <Button
               variant="link"

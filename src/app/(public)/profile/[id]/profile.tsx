@@ -130,7 +130,7 @@ export default function Profile({ id }: { id: string }) {
                   </div>
                   {profile?.phone && (
                     <span className="text-sm flex gap-2">
-                      <Phone className="h-4 w-4" /> Phone number{" "}
+                      <Phone className="h-4 w-4" /> Phone number
                       {profile?.phone}
                     </span>
                   )}
@@ -238,7 +238,7 @@ export default function Profile({ id }: { id: string }) {
                                   </Badge>
                                   <span className="text-muted-foreground text-sm font-medium flex items-center gap-1">
                                     <Calendar className="h-4 w-4" />
-                                    {formatDate(trip.start_date)} -{" "}
+                                    {formatDate(trip.start_date)} -
                                     {formatDate(trip.end_date)}
                                   </span>
                                 </div>

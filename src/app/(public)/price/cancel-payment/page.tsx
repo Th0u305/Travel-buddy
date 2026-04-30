@@ -59,7 +59,7 @@ const CancelPayment = () => {
         </div>
         <div className="bg-surface-container-low p-4 text-center border-t border-outline-variant/10">
           <p className="font-label text-xs text-on-surface-variant flex items-center justify-center gap-1">
-            Need help?{" "}
+            Need help?
             <a className="text-primary hover:underline font-medium" href="#">
               Contact Support
             </a>

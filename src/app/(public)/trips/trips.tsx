@@ -67,11 +67,6 @@ export default function ExploreAdventures() {
     travelType,
   );
   const { travelLists } = useUserStore();
-  // const { updateTripStatusRefetch } = useUpdateTripStatus();
-
-  // useEffect(() => {
-  //   updateTripStatusRefetch()
-  // }, [updateTripStatusRefetch])
 
   useGetTravelListById(hoveredId || "");
   const [isGrid, setIsGrid] = useState<boolean>(true);
@@ -335,12 +330,12 @@ export default function ExploreAdventures() {
 
                   <div className="flex flex-col gap-3 mt-2">
                     <p className="font-bold text-secondary uppercase tracking-widest flex items-center gap-1">
-                      <MapPinIcon className="stroke-green-600 w-4 h-4" />{" "}
+                      <MapPinIcon className="stroke-green-600 w-4 h-4" />
                       {item?.country}/{item?.city}
                     </p>
                     <p className="font-medium text-on-surface-variant flex items-center gap-1">
-                      <CalendarIcon className="stroke-blue-500 w-4 h-4" />{" "}
-                      {item?.start_date?.split("T")[0]} -{" "}
+                      <CalendarIcon className="stroke-blue-500 w-4 h-4" />
+                      {item?.start_date?.split("T")[0]} -
                       {item?.end_date?.split("T")[0]}
                     </p>
                   </div>

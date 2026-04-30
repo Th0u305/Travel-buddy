@@ -68,7 +68,7 @@ import {
 export default function TravelPlan() {
   const router = useRouter();
   const { userData } = useUserStore();
-  const { canCreateTrip } = useCanUserCreateTrip(userData?.data?.id || "");
+  const { canCreateTrip } = useCanUserCreateTrip(userData?.id || "");
   const [open, setOpen] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
 
@@ -95,7 +95,6 @@ export default function TravelPlan() {
 
   const [searchCountry, setSearchCountry] = useState<string>("");
   const { countries } = useGetCountries(searchCountry);
-  const { userProfileCompleted } = useUserStore();
   const [updateProfile, setUpdateProfile] = useState<boolean>(false);
 
   useEffect(() => {
@@ -107,11 +106,11 @@ export default function TravelPlan() {
       setLimitReached(true);
       setOpen(true);
     }
-    if (!userProfileCompleted) {
+    if (!userData?.is_profile_completed) {
       setUpdateProfile(true);
       setOpen(true);
     }
-  }, [canCreateTrip, userProfileCompleted]);
+  }, [canCreateTrip, userData?.is_profile_completed]);
 
   const form = useForm({
     defaultValues: {
@@ -169,7 +168,7 @@ export default function TravelPlan() {
         max_travelers: maxBuddy,
         tags: tags,
         looking_for_buddy: isChecked,
-        status: "active",
+        status: today === startDate ? "ongoing" : "upcoming",
         start_date: formattedStartDate,
         end_date: formattedEndDate,
         travel_type: travelType,
@@ -194,7 +193,6 @@ export default function TravelPlan() {
       }
       try {
         setIsLoading(true);
-        toast.loading("Creating travel plan...");
 
         const response = await fetch(
           `https://api.cloudinary.com/v1_1/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload`,
@@ -222,7 +220,6 @@ export default function TravelPlan() {
 
         createTravelPlan(modifiedData2);
         setIsLoading(false);
-        toast.dismiss();
         setTags(["Photography", "Adventure"]);
         setSearchCountry("");
         form.reset();
@@ -582,7 +579,7 @@ export default function TravelPlan() {
                     {date?.from ? (
                       date.to ? (
                         <>
-                          {format(date.from, "LLL dd, y")} -{" "}
+                          {format(date.from, "LLL dd, y")} -
                           {format(date.to, "LLL dd, y")}
                         </>
                       ) : (
