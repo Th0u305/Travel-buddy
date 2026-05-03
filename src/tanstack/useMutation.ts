@@ -520,3 +520,22 @@ export const useConfirmPayment = () => {
 
   return { confirmPaymentMutate, isPending, isSuccess };
 };
+
+export const useSendMessageMutate = () => {
+
+  const { mutate: sendMessage, isPending } = useMutation({
+    mutationFn: async (value: { receiver_id: string; content: string; userName_slug: string }) => {
+      const data = await axiosInstance.post(
+        "/message/send",
+        value
+      );
+      if (data?.data?.status >= 400) {
+        return toast.error(data?.data?.message || "Failed to send message");
+      }
+      return data?.data?.data;
+    },
+    retry: 0,
+  });
+
+  return { sendMessage, isPending };
+};

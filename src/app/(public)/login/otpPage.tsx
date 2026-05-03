@@ -42,21 +42,22 @@ const OtpPage = ({
     sendOTPMutate(loginFormValue!);
     toast.success("OTP sent successfully");
     setIsVerify(true);
+    toast.dismiss();
   };
 
   const verifyFunc = () => {
     verifyOTPMutate({ email: loginFormValue?.email || "", otp });
     toast.success("OTP verified successfully");
+    toast.dismiss();
     setIsVerify(false);
     setIsOtp(false);
     setTimeLeft(0);
     sessionStorage.setItem("otpSentTime", "0");
-    setTimeout(() => {
-      loginMutate({
-        email: loginFormValue?.email || "",
-        password: loginFormValue?.password || "",
-      });
-    }, 2000);
+    loginMutate({
+      email: loginFormValue?.email || "",
+      password: loginFormValue?.password || "",
+
+    });
   };
 
   return (

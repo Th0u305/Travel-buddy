@@ -18,6 +18,8 @@ import {
   Home,
   Banknote,
   Settings,
+  Users2,
+  CreativeCommons,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -61,6 +63,7 @@ export default function Navbar() {
     { to: "/trips", label: "Trips", icon: Map },
     { to: "/findBuddies", label: "Find Travel Buddy", icon: MapPin },
     { to: "/price", label: "Price", icon: Banknote },
+    { to: "/community", label: "Community", icon: Users2},
   ];
 
   const logOUtFn = async () => {
@@ -99,20 +102,6 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          {user?.email && user?.full_name && (
-            <Link
-              href="/create-travel-plan"
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                location === "/create-travel-plan"
-                  ? "text-white bg-primary"
-                  : !scrolled && isHome
-                    ? "text-white/80 hover:text-white hover:bg-white/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              }`}
-            >
-              Create Travel Plan
-            </Link>
-          )}
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden sm:block">
@@ -126,12 +115,11 @@ export default function Navbar() {
                         {user?.full_name?.charAt(0)?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-
-                    <span
+                    <p
                       className={`text-sm font-medium ${!scrolled && isHome ? "text-white" : "text-foreground"}`}
                     >
                       {user?.full_name}
-                    </span>
+                    </p>
 
                     {user?.subscription_tier === "Premium" && (
                       <BadgeCheck className="w-5 h-5 text-primary stroke-amber-500" />
@@ -161,6 +149,14 @@ export default function Navbar() {
                       className="flex items-center gap-2"
                     >
                       <Settings className="w-4 h-4" /> Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link
+                      href="/create-travel-plan"
+                      className="flex items-center gap-2"
+                    >
+                      <CreativeCommons className="w-4 h-4" /> Create Travel Plan
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

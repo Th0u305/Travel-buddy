@@ -22,10 +22,10 @@ import {
   Users,
 } from "lucide-react";
 import Image from "next/image";
-import { useGetTravelListById } from "@/src/tanstack/useQuery";
+import { useGetChatUsers, useGetTravelListById } from "@/src/tanstack/useQuery";
 import { useParams, useRouter } from "next/navigation";
 import { useUserStore } from "@/src/store/zustand.store";
-import { useJoinTrip, useRemoveFromTrip } from "@/src/tanstack/useMutation";
+import { useJoinTrip, useRemoveFromTrip, useSendMessageMutate } from "@/src/tanstack/useMutation";
 import { toast } from "sonner";
 
 const SingleTravel = ({ id }: { id: string }) => {
@@ -34,10 +34,10 @@ const SingleTravel = ({ id }: { id: string }) => {
   useGetTravelListById(id ? id : (paramsId as string));
   const userData = useUserStore((state) => state.userData);
   const travelList = useUserStore((state) => state.singleTravelList);
-
   const { joinTrip } = useJoinTrip();
-
   const router = useRouter();
+  const { sendMessage } = useSendMessageMutate();
+  const {chatUsersRefetch} = useGetChatUsers()
 
   const calculateDuration = () => {
     if (!travelList) return 0;
@@ -49,9 +49,7 @@ const SingleTravel = ({ id }: { id: string }) => {
   };
 
   const { removeFromTrip } = useRemoveFromTrip();
-console.log(travelList);
-  const isUserJoined =
-    userData?.id && travelList?.participantsId?.includes(userData?.id);
+  const isUserJoined = userData?.id && travelList?.participantsId?.includes(userData?.id);
 
   const handleJoinTrip = async () => {
     if (!userData) {
@@ -71,6 +69,16 @@ console.log(travelList);
       userId: userData?.id,
     });
   };
+
+  const sendMessageFn = (username_slug: string, id : string) => {
+    sendMessage({
+      receiver_id: id,
+      content: "",
+      userName_slug: username_slug,
+    });
+    chatUsersRefetch()
+    router.push(`/community`)
+  }
 
   const orderStatus = [
     {
@@ -265,9 +273,9 @@ console.log(travelList);
             Certified mountain guide & Patagonia specialist with 10+ years
             experience.
           </p>
-          <button className="cursor-pointer active:scale-95 transition-all w-full bg-white py-3 rounded-xl font-bold text-primary hover:bg-primary hover:text-white border border-outline-variant/30">
+          <Button onClick={()=>sendMessageFn(travelList?.profiles?.username_slug || "",travelList?.profiles?.id || "")} className="cursor-pointer active:scale-95 transition-all w-full bg-white py-3 rounded-xl font-bold text-primary hover:bg-primary hover:text-white border border-outline-variant/30">
             Message Host
-          </button>
+          </Button>
         </div>
       </section>
 

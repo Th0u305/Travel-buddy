@@ -20,10 +20,13 @@ import {
   useFindBuddies,
   useGetUserViewProfile,
   useGetTravelListById,
+  useGetChatUsers,
 } from "@/src/tanstack/useQuery";
 import Pagination from "@/src/components/ui/pagination";
 import Skeleton from "@/src/components/ui/skeleton";
 import { TravelBuddiesTs } from "@/src/types/types";
+import { useRouter } from "next/navigation";
+import { useSendMessageMutate } from "@/src/tanstack/useMutation";
 
 export default function FindBuddies() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,6 +37,9 @@ export default function FindBuddies() {
   const [isGrid, setIsGrid] = useState<boolean>(true);
   const [userSlug, setUserSlug] = useState<string | null>(null);
   useGetUserViewProfile(userSlug || "");
+  const router = useRouter()
+  const { sendMessage } = useSendMessageMutate();
+  const {chatUsersRefetch} = useGetChatUsers()
 
   const { isLoading } = useFindBuddies(
     searchQuery,
@@ -53,6 +59,16 @@ export default function FindBuddies() {
       setCurrentPage(1);
     },
   });
+
+  const sendMessageFn = (username_slug: string, id : string) => {
+    sendMessage({
+      receiver_id: id,
+      content: "",
+      userName_slug: username_slug,
+    });
+    chatUsersRefetch()
+    router.push(`/community`)
+  }
 
   return (
     <>
@@ -283,8 +299,8 @@ export default function FindBuddies() {
                             </Button>
                           </Link>
                         </div>
-
                         <Button
+                          onClick={()=> sendMessageFn(traveler.profiles.username_slug || "", traveler.profiles.id)}
                           variant="outline"
                           size="icon"
                           className="rounded-full shrink-0 aspect-square w-10 h-10 border-muted-foreground/30 text-orange-600 hover:bg-orange-50"

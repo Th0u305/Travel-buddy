@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { envVars } from "../config/env";
 import { useUserStore } from "../store/zustand.store";
 import { toast } from "sonner";
+import { useUserMessageStore } from "../store/userMesage.store";
 
 export function useGetUserProfile() {
 
@@ -193,4 +194,68 @@ export function useGetUserFullProfile() {
     retry: 1,
   });
   return { userFullProfile, getUserFullProfileRefetch, isLoading };
+}
+
+// export function useGetMessageHistory(receiverId: string) {
+//   const { setSelectedMessageUser, setRoomId } = useUserMessageStore();
+//   const {
+//     data: messageHistory,
+//     refetch: messageHistoryRefetch,
+//     isLoading,
+//   } = useQuery({
+//     queryKey: ["messageHistory", receiverId],
+//     queryFn: async () => {
+//       const res = await axiosInstance.get(
+//         `/message/history/${receiverId}`
+//       );
+//       if (!res?.data?.success) {
+//         return
+//       }
+//       const { messages, room_id } = res.data.data;
+//       setSelectedMessageUser(messages);
+//       setRoomId(room_id);
+//       return res.data.data;
+//     },
+//     retry: 1,
+//     enabled: receiverId?.length > 0 ? true : false,
+//   });
+//   return { messageHistoryRefetch, isLoading, messageHistory };
+// }
+
+
+export function useGetChatUsers() {
+  const setChatUsers = useUserMessageStore((state)=> state.setChatUsers);
+  const {
+    data: chatUsers,
+    refetch: chatUsersRefetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ["chatUsers"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/message/users`);
+      if (!res?.data?.success) {
+        return toast.error("Something went wrong");
+      }
+      setChatUsers(res?.data?.data);
+      return res?.data?.data;
+    },
+    retry: 1,
+    enabled: true,
+  });
+  return { chatUsersRefetch, isLoading, chatUsers };
+}
+
+export function useGetMessageHistory(receiverId: string, userName_slug: string) {
+  return useQuery({
+    queryKey: ["messageHistory", receiverId],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/message/history/${receiverId}/${userName_slug}`);
+      if (!res?.data?.success) throw new Error("Failed");
+      return res.data.data; // { messages: [...], room_id: '...' }
+    },
+    enabled: !!receiverId,
+    // Prevent React Query from silently refetching and overwriting
+    // our optimistic updates / realtime-appended messages.
+    staleTime: Infinity,
+  });
 }

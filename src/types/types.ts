@@ -74,6 +74,7 @@ export interface SmallProfile {
   subscription_plan: string | null;
   subscription_expires_at: Date | null;
   is_profile_completed: boolean;
+  bio : string | null;
 }
 
 export interface TravelBuddiesTs {
@@ -86,4 +87,31 @@ export interface TravelBuddiesTs {
   slug: string;
   travel_type: string;
   profiles: SmallProfile;
+}
+
+export interface ChatUsersTs {
+ last_message_at: string
+ room_id:string
+ user: SmallProfile;
+ content?:string;
+ sender_id?:string
+ id?:string;
+
+} 
+
+
+export interface MessageHistoryTs {
+  room_id?: string;
+  messages?: Array<{
+    updated_at: string;
+    type: string;
+    sender_id: string;
+    room_id: string;
+    receiver_id: string;
+    metadata: { url: string; fileName: string };
+    is_deleted: boolean;
+    id: string;
+    created_at: string;
+    content: string;
+  }>;
 }

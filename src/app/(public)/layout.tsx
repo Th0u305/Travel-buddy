@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Footer from "@/src/components/layout/Footer";
 import Navbar from "@/src/components/layout/Navbar";
-import { useGetUserFullProfile, useGetUserProfile } from "@/src/tanstack/useQuery";
+import { useGetChatUsers, useGetUserFullProfile, useGetUserProfile } from "@/src/tanstack/useQuery";
 import Loading from "@/src/components/loading";
 
 export default function PublicLayout({
@@ -13,11 +13,13 @@ export default function PublicLayout({
 }) {
   const { userProfileRefetch, isLoading } = useGetUserProfile();
   const { getUserFullProfileRefetch } = useGetUserFullProfile();
+  const { chatUsersRefetch } = useGetChatUsers();
 
   useEffect(() => {
     userProfileRefetch();
     getUserFullProfileRefetch();
-  }, [userProfileRefetch, getUserFullProfileRefetch]);
+    chatUsersRefetch();
+  }, [userProfileRefetch, getUserFullProfileRefetch, chatUsersRefetch]);
 
   if (isLoading) {
     return (
