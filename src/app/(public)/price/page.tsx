@@ -26,7 +26,7 @@ import {
 export default function PricingAndCheckout() {
   const [isAnnual, setIsAnnual] = useState(true);
   const router = useRouter();
-  const { userData } = useUserStore();
+  const { userData , userFullProfile} = useUserStore();
   const [open, setOpen] = useState(false);
 
   const handlePrice = () => {
@@ -34,8 +34,9 @@ export default function PricingAndCheckout() {
       return toast.error("Please login to continue");
     }
 
-    if (!userData?.is_profile_completed) {
-      return setOpen(true);
+    if (!userFullProfile?.bio || !userFullProfile?.avatar_url || !userFullProfile?.phone || !userFullProfile?.travel_interests || !userFullProfile?.country) {
+      setOpen(true);
+      return;
     }
 
     if (userData.subscription_tier && userData.subscription_expires_at) {
