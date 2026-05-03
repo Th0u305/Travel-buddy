@@ -13,6 +13,7 @@ import {
   SendHorizonal,
   Volume2,
   VolumeOff,
+  ArrowLeft,
 } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
@@ -39,6 +40,7 @@ const MessagePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<ChatUsersTs | null>(null);
   const { playRandomKeyStrokeSound } = useKeyboardSound();
+  const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
   const { roomId, setRoomId } = useUserMessageStore();
   const queryClient = useQueryClient();
   const supabase = createClient();
@@ -200,6 +202,7 @@ const MessagePage = () => {
   const handleSelectUser = (chatUser: ChatUsersTs) => {
     setRoomId(chatUser.room_id);
     setSelectedUser(chatUser);
+    setIsMobileChatOpen(true);
   };
 
   const filteredChatUsers = chatUsers?.filter((u:ChatUsersTs) =>
@@ -209,7 +212,7 @@ const MessagePage = () => {
   return (
     <main className="mt-20 flex-1 flex overflow-hidden w-full mx-auto">
       {/* ── Left sidebar ── */}
-      <div className="w-80 flex flex-col border-r z-10">
+      <div className={`flex flex-col border-r z-10 ${isMobileChatOpen ? "hidden md:flex md:w-80" : "w-full md:w-80"}`}>
         {/* User header */}
         <div className="flex justify-between items-center p-6">
           <div className="relative flex gap-2">
@@ -317,38 +320,46 @@ const MessagePage = () => {
       </div>
 
       {/* ── Middle: chat area ── */}
-      <section className="flex-1 flex flex-col bg-surface h-[90vh]">
+      <section className={`flex-1 flex-col bg-surface h-[90vh] ${!isMobileChatOpen ? "hidden md:flex" : "flex"}`}>
         {selectedUser ? (
           <>
             {/* Chat header */}
-            <div onClick={()=> router.push(`/profile/${selectedUser.user?.username_slug}`)} className="flex items-center gap-3 px-6 py-4 border-b border-surface-dim/20 shrink-0">
-              <Image
-                loading="eager"
-                src={
-                  selectedUser.user?.avatar_url ||
-                  `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1776234313/ughr5xdhrc1x7yvgj2va.png`
-                }
-                alt={selectedUser.user?.full_name || ""}
-                width={40}
-                height={40}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-              <div>
-                <h2 className="font-headline font-bold text-sm text-on-surface">
-                  {selectedUser.user?.full_name}
-                </h2>
-                <p className="text-xs text-on-surface-variant">
-                  {selectedUser.user?.username_slug
-                    ? `@${selectedUser.user.username_slug}`
-                    : ""}
-                </p>
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-dim/20 shrink-0">
+              <button 
+                className="md:hidden mr-1" 
+                onClick={(e) => { e.stopPropagation(); setIsMobileChatOpen(false); }}
+              >
+                <ArrowLeft className="w-6 h-6 text-on-surface" />
+              </button>
+              <div onClick={()=> router.push(`/profile/${selectedUser.user?.username_slug}`)} className="flex items-center gap-3 cursor-pointer">
+                <Image
+                  loading="eager"
+                  src={
+                    selectedUser.user?.avatar_url ||
+                    `https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1776234313/ughr5xdhrc1x7yvgj2va.png`
+                  }
+                  alt={selectedUser.user?.full_name || ""}
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <div>
+                  <h2 className="font-headline font-bold text-sm text-on-surface">
+                    {selectedUser.user?.full_name}
+                  </h2>
+                  <p className="text-xs text-on-surface-variant">
+                    {selectedUser.user?.username_slug
+                      ? `@${selectedUser.user.username_slug}`
+                      : ""}
+                  </p>
+                </div>
               </div>
             </div>
 
             {/* Messages */}
             <div
               ref={containerRef}
-              className="flex-1 overflow-y-auto p-6 space-y-4"
+              className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4"
             >
               {messages?.messages?.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center gap-3 text-on-surface-variant">
@@ -368,13 +379,13 @@ const MessagePage = () => {
                       {(msg?.content?.trim()?.length ?? 0) > 0 && (
                         <>
                           <div
-                            className={`max-w-[70%] p-3 rounded-2xl ${
+                            className={`max-w-[85%] md:max-w-[70%] p-3 rounded-2xl ${
                               isMe
                                 ? "bg-primary text-on-primary rounded-br-none text-white"
                                 : "bg-secondary text-on-surface rounded-bl-none"
                             }`}
                           >
-                            <p className="font-body text-sm">{msg.content}</p>
+                            <p className="font-body text-sm wrap-break-words whitespace-pre-wrap">{msg.content}</p>
                           </div>
                         </>
                       )}
@@ -385,7 +396,7 @@ const MessagePage = () => {
             </div>
 
             {/* Message input */}
-            <div className="p-6  border-t border-surface-dim/20 shrink-0">
+            <div className="p-4 md:p-6 border-t border-surface-dim/20 shrink-0">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -400,7 +411,7 @@ const MessagePage = () => {
                 <form.Field name="message">
                   {(field) => (
                     <Textarea
-                      className="focus-visible:border-none focus-visible:ring-none focus-visible:ring-0 flex-1 border-none resize-none py-3 px-2 text-sm font-body text-on-surface placeholder:text-on-surface-variant/70 w-90"
+                      className="focus-visible:border-none focus-visible:ring-none focus-visible:ring-0 flex-1 border-none resize-none py-3 px-2 text-sm font-body text-on-surface placeholder:text-on-surface-variant/70 min-w-0"
                       placeholder="Type a message..."
                       cols={2}
                       rows={2}
@@ -420,7 +431,7 @@ const MessagePage = () => {
                     />
                   )}
                 </form.Field>
-                <Button size="lg" variant="default" type="submit">
+                <Button size="lg" className="w-12 h-12" variant="default" type="submit">
                   <SendHorizonal />
                 </Button>
               </form>

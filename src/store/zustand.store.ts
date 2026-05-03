@@ -10,6 +10,7 @@ interface UserStore {
   userData: SmallProfile | null;
   setUserData: (userData: SmallProfile) => void;
   removeUserData: () => void;
+  
   isLoggedIn: boolean;
   setIsLoggedIn: (state: boolean) => void;
 
@@ -33,6 +34,7 @@ interface UserStore {
 export const useUserStore = create<UserStore>()((set) => ({
   isLoggedIn: false,
   setIsLoggedIn: (state: boolean) => set({ isLoggedIn: state }),
+  
   userData: null,
   setUserData: (userData: SmallProfile) =>
     set({ userData, isLoggedIn: true }),

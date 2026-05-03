@@ -67,7 +67,7 @@ import {
 
 export default function TravelPlan() {
   const router = useRouter();
-  const { userData } = useUserStore();
+  const { userData , userFullProfile} = useUserStore();
   const { canCreateTrip } = useCanUserCreateTrip(userData?.id || "");
   const [open, setOpen] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
@@ -106,11 +106,11 @@ export default function TravelPlan() {
       setLimitReached(true);
       setOpen(true);
     }
-    if (!userData?.is_profile_completed) {
+    if (!userFullProfile?.bio || !userFullProfile?.avatar_url || !userFullProfile?.phone || !userFullProfile?.travel_interests || !userFullProfile?.country) {
       setUpdateProfile(true);
       setOpen(true);
     }
-  }, [canCreateTrip, userData?.is_profile_completed]);
+  }, [canCreateTrip, userFullProfile]);
 
   const form = useForm({
     defaultValues: {

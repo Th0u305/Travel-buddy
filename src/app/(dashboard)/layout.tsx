@@ -13,7 +13,7 @@ const RootDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex">
       <DashboardLayout />
-      <div className="flex-1">{children}</div>
+      <div className="flex-1 p-2 sm:p-0">{children}</div>
     </div>
   );
 };

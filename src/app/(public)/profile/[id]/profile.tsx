@@ -97,8 +97,8 @@ export default function Profile({ id }: { id: string }) {
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent"></div>
 
-          <div className="absolute bottom-0 left-0 w-full p-8 md:p-12">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-end gap-6">
+          <div className="absolute bottom-0 left-0 w-full p-6 md:p-12">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-end gap-6">
               <div className="relative">
                 <div className="w-32 h-32 md:w-48 md:h-48 rounded-xl border-4 border-background overflow-hidden shadow-xl bg-background">
                   <Image
@@ -224,7 +224,7 @@ export default function Profile({ id }: { id: string }) {
                               width={500}
                               height={500}
                               alt={trip.title}
-                              className={`w-60 h-60 object-cover transition-all duration-500 group-hover:scale-105 ${!profile?.travel_plans[0]?.status ? "grayscale group-hover:grayscale-0" : ""}`}
+                              className={`w-full md:w-60 h-48 md:h-60 object-cover transition-all duration-500 group-hover:scale-105 ${!profile?.travel_plans[0]?.status ? "grayscale group-hover:grayscale-0" : ""}`}
                               src={profile?.travel_plans[0]?.image}
                             />
 
@@ -299,7 +299,7 @@ export default function Profile({ id }: { id: string }) {
                   </Button>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-2 gap-4 h-150">
+                <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-2 gap-4 h-96 md:h-150">
                   {gallery.map((item) => (
                     <div
                       key={item.id}

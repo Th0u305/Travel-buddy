@@ -37,7 +37,7 @@ export default function MyTripsDashboard() {
   const router = useRouter();
 
   return (
-    <main className="h-screen flex flex-col max-w-7xl mx-auto mt-20 gap-5 ml-8">
+    <main className="min-h-screen flex flex-col max-w-7xl mx-auto mt-16 md:mt-20 gap-5 px-4 lg:ml-8 pb-10">
       {/* Page Header & Tabs */}
       <div className="flex flex-col gap-6">
         <div className="flex justify-between items-end">
@@ -63,8 +63,8 @@ export default function MyTripsDashboard() {
         </div>
       </div>
 
-      <div className="flex w-full flex-row-reverse gap-3 items-end justify-end">
-        <div className="bg-gray-200 rounded-3xl p-6 flex flex-col gap-1.5 h-full">
+      <div className="flex w-full flex-col lg:flex-row-reverse gap-6 items-stretch lg:items-start justify-end">
+        <div className="bg-gray-200 rounded-3xl p-6 flex flex-col gap-1.5 w-full lg:w-1/3 xl:w-1/4">
           {/* User Profile Header */}
           <div className="flex items-center gap-4 overflow-hidden">
             <Image

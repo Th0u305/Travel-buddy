@@ -20,6 +20,7 @@ import {
   Settings,
   Users2,
   CreativeCommons,
+  LayoutDashboardIcon,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -80,9 +81,7 @@ export default function Navbar() {
     >
       <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
         <div
-          className={`text-2xl font-black tracking-tight  ${
-            scrolled || !isHome ? "text-[#30332e]" : "text-white"
-          }`}
+          className={`text-2xl font-black tracking-tight`}
         >
           <Link href="/">TravelBuddy</Link>
         </div>
@@ -95,7 +94,7 @@ export default function Navbar() {
                 location === link.to
                   ? "text-white bg-primary"
                   : !scrolled && isHome
-                    ? "text-white/80 hover:text-white hover:bg-white/10"
+                    ? "hover:text-white hover:bg-white/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               }`}
             >
@@ -108,7 +107,7 @@ export default function Navbar() {
             {isAuthenticated === true ? (
               <Menu>
                 <DropdownMenuTrigger>
-                  <div className="border hover:border-primary flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-primary transition-colors cursor-pointer">
+                  <div className="border border-primary flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-primary transition-colors cursor-pointer">
                     <Avatar className="w-8 h-8">
                       <AvatarImage src={user?.avatar_url || "#"} />
                       <AvatarFallback className="bg-background text-primary text-xs font-semibold">
@@ -116,7 +115,6 @@ export default function Navbar() {
                       </AvatarFallback>
                     </Avatar>
                     <p
-                      className={`text-sm font-medium ${!scrolled && isHome ? "text-white" : "text-foreground"}`}
                     >
                       {user?.full_name}
                     </p>
@@ -237,14 +235,26 @@ export default function Navbar() {
                         <Map className="w-4 h-4" /> Create Travel Plan
                       </Link>
                     )}
+                    {user?.email && user?.full_name && (
+                      <Link
+                        href="/dashboard"
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                          location === "/dashboard"
+                            ? "bg-primary/10 text-primary"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                        }`}
+                      >
+                        <LayoutDashboardIcon className="w-4 h-4" /> Dashboard
+                      </Link>
+                    )}
                   </div>
                   <div className="p-4 border-t">
                     {isAuthenticated === true ? (
-                      <div className="space-y-3">
+                      <div className="space-y-5">
                         <Link
-                          href="/profile"
+                          href="/dashboard"
                           onClick={() => setIsOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted"
+                          className="flex items-center gap-3 rounded-xl hover:bg-muted"
                         >
                           <Avatar className="w-8 h-8">
                             <AvatarImage src={user?.avatar_url || "#"} />

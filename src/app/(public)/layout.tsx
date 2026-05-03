@@ -21,13 +21,13 @@ export default function PublicLayout({
     chatUsersRefetch();
   }, [userProfileRefetch, getUserFullProfileRefetch, chatUsersRefetch]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[#212121]">
-        <Loading />
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen bg-[#212121]">
+  //       <Loading />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="relative">

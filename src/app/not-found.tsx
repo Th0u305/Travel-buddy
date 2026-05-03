@@ -12,15 +12,15 @@ export default function NotFound() {
   const router = useRouter();
   return (
     <main
-      className="relative grow flex items-center justify-center h-screen overflow-hidden"
+      className="relative grow flex items-center justify-center pt-5 pb-5 overflow-hidden"
       style={{
         background: `url(https://res.cloudinary.com/${envVars.NEXT_PUBLIC_IMAGE_CLOUD_NAME}/image/upload/q_auto/f_auto/v1775199305/ktkmcvfosbwsgf9tfagc.jpg)`,
         backgroundSize: "cover",
       }}
     >
       {/* 404 Content Card */}
-      <div className="relative z-10 w-full max-w-2xl px-6 bg-muted/80 backdrop-blur-sm rounded-4xl">
-        <div className="glass-panel p-10 md:p-16 rounded-2xl shadow-sm text-center flex flex-col items-center gap-6">
+      <div className="relative z-10 w-full max-w-2xl px-4 md:px-6 bg-muted/80 backdrop-blur-sm rounded-4xl mx-4 md:mx-0">
+        <div className="glass-panel p-6 sm:p-10 md:p-16 rounded-2xl shadow-sm text-center flex flex-col items-center gap-6">
           {/* Icon/Graphic */}
           <div className="mb-6 flex justify-center items-center w-20 h-20 rounded-full bg-secondary-container/50 text-secondary">
             <div className="loader"></div>
@@ -49,10 +49,10 @@ export default function NotFound() {
 
           {/* Navigation Actions */}
           <div className="flex flex-col sm:flex-row gap-4 w-full justify-evenly">
-            <Button onClick={()=>router.push("/home")} variant="default" className="w-[50%] h-15 rounded-full cursor-pointer active:scale-[0.98] transition-all">
+            <Button onClick={()=>router.push("/home")} variant="default" className="w-full sm:flex-1 h-15 rounded-full cursor-pointer active:scale-[0.98] transition-all">
               <Home className="mr-2" /> Back to Home
             </Button>
-            <Button onClick={()=>router.push("/trips")} variant="default" className="w-[50%] h-15 rounded-full cursor-pointer active:scale-[0.98] transition-all">
+            <Button onClick={()=>router.push("/trips")} variant="default" className="w-full sm:flex-1 h-15 rounded-full cursor-pointer active:scale-[0.98] transition-all">
               <BookOpen className="mr-2" /> View Journeys
             </Button>
           </div>

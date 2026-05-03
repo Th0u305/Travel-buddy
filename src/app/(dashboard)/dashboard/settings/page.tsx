@@ -48,7 +48,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="pt-24 pb-32 px-6 max-w-6xl mx-auto">
+    <main className="pt-16 md:pt-24 pb-20 md:pb-32 px-4 md:px-6 max-w-6xl mx-auto">
       {/* Settings Header */}
       <div className="mb-12">
         <h1 className="text-4xl font-headline font-extrabold text-on-surface tracking-tight mb-2">
@@ -160,11 +160,11 @@ export default function SettingsPage() {
                     </InputGroupAddon>
                   </InputGroup>
                 </div>
-                <Button onClick={handleUpdatePassword} disabled={isPending || !canUpdatePassword} size="lg" variant="default" className="col-span-2 active:scale-95 transition-all w-70 mx-auto">
+                <Button onClick={handleUpdatePassword} disabled={isPending || !canUpdatePassword} size="lg" variant="default" className="col-span-1 md:col-span-2 active:scale-95 transition-all w-full md:w-70 mx-auto">
                     {isPending ? "Updating..." : "Update Password"}
                 </Button>
               </div>
-              <div className="bg-white rounded-xl p-6 shadow-sm flex items-center justify-between group">
+              <div className="bg-white rounded-xl p-6 shadow-sm flex flex-col sm:flex-row gap-2 items-center justify-between group">
                 <div className="flex items-start gap-4">
                   <div className="bg-accent text-on-secondary-container p-3 rounded-xl">
                     <LucidePhone />
@@ -258,38 +258,38 @@ export default function SettingsPage() {
             id="subscription"
           >
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-center gap-6">
                 <div className="bg-primary rounded-2xl p-4 text-white">
-                  <StarIcon className="fill-white stroke-white w-10 h-10" />
+                  <StarIcon className="fill-white stroke-white sm:w-10 sm:h-10" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <h2 className="text-2xl font-headline font-extrabold text-tertiary">
                       Explorer Pro
                     </h2>
-                    <span className="bg-primary text-white text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full">
+                    <p className="bg-primary text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
                       Active
-                    </span>
+                    </p>
                   </div>
                   <p className="text-on-tertiary-container font-medium">
                     Renews on Oct 12, 2024 • $14.99/mo
                   </p>
                 </div>
               </div>
-              <div className="flex gap-4">
-                <Button size="lg" variant="default" className="bg-accent border-0 outline-0 text-black rounded-full hover:scale-105 active:scale-100 transition-all hover:text-white">
+              <div className="flex flex-col sm:flex-row w-full md:w-auto gap-4">
+                <Button size="lg" variant="default" className="w-full sm:w-auto bg-accent border-0 outline-0 text-black rounded-full hover:scale-105 active:scale-100 transition-all hover:text-white">
                   Change Plan
                 </Button>
-                <Button size="lg" className="bg-white border-0 outline-0 text-black rounded-full hover:scale-105 active:scale-100 transition-all hover:text-white" variant={"default"}>Manage</Button>
+                <Button size="lg" className="w-full sm:w-auto bg-white border-0 outline-0 text-black rounded-full hover:scale-105 active:scale-100 transition-all hover:text-white" variant={"default"}>Manage</Button>
               </div>
             </div>
           </section>
           {/* Bottom Action Bar (Contextual) */}
-          <div className="flex items-center justify-end gap-4 pt-6">
-            <Button size="lg" variant="default" className="bg-white border-0 outline-0 text-black rounded-full hover:scale-105 active:scale-100 transition-all hover:text-white" >
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-4 pt-6">
+            <Button size="lg" variant="default" className="h-10 bg-white border-0 outline-0 text-black rounded-full hover:scale-105 active:scale-100 transition-all hover:text-white" >
               Discard Changes
             </Button>
-            <Button size="lg" variant="default" className="bg-primary border-0 outline-0 text-white rounded-full hover:scale-105 active:scale-100 transition-all" >
+            <Button size="lg" variant="default" className="h-10 bg-primary border-0 outline-0 text-white rounded-full hover:scale-105 active:scale-100 transition-all" >
               Save Preferences
             </Button>
           </div>

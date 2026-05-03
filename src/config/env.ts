@@ -31,6 +31,9 @@ interface EnvConfig {
     NEXT_PUBLIC_CONFIRM_PAYMENT: string;
     NEXT_PUBLIC_JOIN_TRIP : string;
     NEXT_PUBLIC_REMOVE_FROM_TRIP : string;
+    NEXT_PUBLIC_MESSAGE_USERS : string;
+    NEXT_PUBLIC_MESSAGE_HISTORY : string;
+    NEXT_PUBLIC_MESSAGE_SEND : string;
 }
 
 
@@ -67,7 +70,10 @@ const loadEnvVariables = (): EnvConfig => {
         "NEXT_PUBLIC_CREATE_CHECKOUT_SESSION",
         "NEXT_PUBLIC_CONFIRM_PAYMENT",
         "NEXT_PUBLIC_JOIN_TRIP",
-        "NEXT_PUBLIC_REMOVE_FROM_TRIP"
+        "NEXT_PUBLIC_REMOVE_FROM_TRIP",
+        "NEXT_PUBLIC_MESSAGE_USERS",
+        "NEXT_PUBLIC_MESSAGE_HISTORY",
+        "NEXT_PUBLIC_MESSAGE_SEND"
     ]
 
     requireEnvVariable.forEach((variable) => {
@@ -110,6 +116,9 @@ const loadEnvVariables = (): EnvConfig => {
         NEXT_PUBLIC_CONFIRM_PAYMENT: process.env.NEXT_PUBLIC_CONFIRM_PAYMENT as string,
         NEXT_PUBLIC_JOIN_TRIP: process.env.NEXT_PUBLIC_JOIN_TRIP as string,
         NEXT_PUBLIC_REMOVE_FROM_TRIP: process.env.NEXT_PUBLIC_REMOVE_FROM_TRIP as string,
+        NEXT_PUBLIC_MESSAGE_USERS: process.env.NEXT_PUBLIC_MESSAGE_USERS as string,
+        NEXT_PUBLIC_MESSAGE_HISTORY: process.env.NEXT_PUBLIC_MESSAGE_HISTORY as string,
+        NEXT_PUBLIC_MESSAGE_SEND: process.env.NEXT_PUBLIC_MESSAGE_SEND as string,
     }
 }
 

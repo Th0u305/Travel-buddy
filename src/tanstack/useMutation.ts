@@ -526,7 +526,7 @@ export const useSendMessageMutate = () => {
   const { mutate: sendMessage, isPending } = useMutation({
     mutationFn: async (value: { receiver_id: string; content: string; userName_slug: string }) => {
       const data = await axiosInstance.post(
-        "/message/send",
+        envVars.NEXT_PUBLIC_MESSAGE_SEND,
         value
       );
       if (data?.data?.status >= 400) {

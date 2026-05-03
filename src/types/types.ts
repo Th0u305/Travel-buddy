@@ -73,7 +73,6 @@ export interface SmallProfile {
   subscription_tier: string | null;
   subscription_plan: string | null;
   subscription_expires_at: Date | null;
-  is_profile_completed: boolean;
   bio : string | null;
 }
 

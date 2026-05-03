@@ -73,7 +73,7 @@ export default function FindBuddies() {
   return (
     <>
       {/* Main Content */}
-      <main className="pt-24 pb-12 px-8 max-w-360 mx-auto min-h-screen">
+      <main className="pt-16 md:pt-24 pb-12 px-4 md:px-8 max-w-360 mx-auto min-h-screen mt-10">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar / Filters */}
           <aside className="w-full md:w-72 shrink-0 space-y-8">
@@ -272,33 +272,31 @@ export default function FindBuddies() {
                         </div>
                       )}
 
-                      <div className="flex items-center flex-wrap gap-2">
-                        <div className="flex items-center gap-2">
-                          <Link
-                            prefetch={true}
-                            href={`/trips/${traveler.slug}`}
-                            className="flex-1 flex"
+                      <div className="flex items-center gap-2 w-full">
+                        <Link
+                          prefetch={true}
+                          href={`/trips/${traveler.slug}`}
+                          className="flex-1 flex"
+                        >
+                          <Button
+                            size="lg"
+                            className="w-full rounded-full font-bold text-xs h-10"
                           >
-                            <Button
-                              size="lg"
-                              className="rounded-full font-bold text-xs"
-                            >
-                              View Trip
-                            </Button>
-                          </Link>
-                          <Link
-                            prefetch={true}
-                            href={`/profile/${traveler.profiles.username_slug}`}
-                            className="flex-1 flex"
+                            View Trip
+                          </Button>
+                        </Link>
+                        <Link
+                          prefetch={true}
+                          href={`/profile/${traveler.profiles.username_slug}`}
+                          className="flex-1 flex"
+                        >
+                          <Button
+                            size="lg"
+                            className="w-full rounded-full font-bold text-xs h-10"
                           >
-                            <Button
-                              size="lg"
-                              className="rounded-full font-bold text-xs"
-                            >
-                              View user profile
-                            </Button>
-                          </Link>
-                        </div>
+                            View Profile
+                          </Button>
+                        </Link>
                         <Button
                           onClick={()=> sendMessageFn(traveler.profiles.username_slug || "", traveler.profiles.id)}
                           variant="outline"

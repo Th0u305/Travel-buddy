@@ -39,7 +39,7 @@ export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="">
+    <div className="absolute sm:relative">
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-1 flex-col pt-10 overflow-x-hidden overflow-y-auto">

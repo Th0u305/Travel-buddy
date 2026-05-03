@@ -179,7 +179,7 @@ export default function ProfilePage() {
   });
 
   return (
-    <main className="max-w-4xl mx-auto px-6 pt-24 space-y-12 pb-12">
+    <main className="max-w-4xl mx-auto px-4 md:px-6 pt-16 md:pt-24 space-y-8 md:space-y-12 pb-12">
       {isLoading ? (
         <div className="h-screen">
           <Spinner className="w-fit mx-auto text-blue-600" />
@@ -506,10 +506,10 @@ export default function ProfilePage() {
                       ) : (
                         travelInterests.map((interest: string, idx: number) => (
                           <p key={idx}
-                            className="text-black flex items-center gap-1 relative bg-secondary p-2 rounded-full text-sm"
+                            className="text-black flex items-center gap-1 relative bg-secondary p-2 rounded-full text-sm pr-8"
                           >
                             {interest}
-                          <XCircleIcon onClick={() => handleRemoveInterest(interest)} className="text-red-500 bg-white rounded-full outline-0 border-0 p-0 w-5 h-5 cursor-pointer absolute left-31 bottom-6" />
+                          <XCircleIcon onClick={() => handleRemoveInterest(interest)} className="text-red-500 bg-white rounded-full outline-0 border-0 p-0 w-5 h-5 cursor-pointer absolute right-1 top-1/2 -translate-y-1/2" />
                           </p>
                         ))
                       )}

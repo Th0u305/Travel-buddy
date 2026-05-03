@@ -10,17 +10,6 @@ export default function Footer() {
               Curating the world&aposs most breathtaking adventures for the modern
               traveler. Join the movement.
             </p>
-            <div className="flex gap-4">
-              <span className="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">
-                public
-              </span>
-              <span className="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">
-                camera_outdoor
-              </span>
-              <span className="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">
-                hiking
-              </span>
-            </div>
           </div>
           <div className="space-y-4">
             <h4 className="font-bold">Discover</h4>

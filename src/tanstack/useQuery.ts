@@ -25,15 +25,15 @@ export function useGetUserProfile() {
   return { userProfileRefetch, isLoading, user };
 }
 
-export function useGetTravelListsByPagination(page: number,searchQuery: string,travelType: string) {
+export function useGetTravelListsByPagination(page: number,searchQuery: string,travelType: string, limit: number = 12) {
 
   const { setTravelLists } = useUserStore();
   const { refetch: travelListsRefetch, isLoading } = useQuery({
-  queryKey: ["travelLists", page, searchQuery, travelType],
+  queryKey: ["travelLists", page, searchQuery, travelType, limit],
     queryFn: async () => {
       const res = await axiosInstance.get(
         envVars.NEXT_PUBLIC_GET_TRAVEL_LISTS +
-          `?page=${page}&search=${searchQuery}&travelType=${travelType}`,
+          `?page=${page}&search=${searchQuery}&travelType=${travelType}&limit=${limit}`,
       );
       if (!res?.data?.success) {
         return toast.error("Something went wrong");
@@ -196,33 +196,6 @@ export function useGetUserFullProfile() {
   return { userFullProfile, getUserFullProfileRefetch, isLoading };
 }
 
-// export function useGetMessageHistory(receiverId: string) {
-//   const { setSelectedMessageUser, setRoomId } = useUserMessageStore();
-//   const {
-//     data: messageHistory,
-//     refetch: messageHistoryRefetch,
-//     isLoading,
-//   } = useQuery({
-//     queryKey: ["messageHistory", receiverId],
-//     queryFn: async () => {
-//       const res = await axiosInstance.get(
-//         `/message/history/${receiverId}`
-//       );
-//       if (!res?.data?.success) {
-//         return
-//       }
-//       const { messages, room_id } = res.data.data;
-//       setSelectedMessageUser(messages);
-//       setRoomId(room_id);
-//       return res.data.data;
-//     },
-//     retry: 1,
-//     enabled: receiverId?.length > 0 ? true : false,
-//   });
-//   return { messageHistoryRefetch, isLoading, messageHistory };
-// }
-
-
 export function useGetChatUsers() {
   const setChatUsers = useUserMessageStore((state)=> state.setChatUsers);
   const {
@@ -232,7 +205,7 @@ export function useGetChatUsers() {
   } = useQuery({
     queryKey: ["chatUsers"],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/message/users`);
+      const res = await axiosInstance.get(envVars.NEXT_PUBLIC_MESSAGE_USERS);
       if (!res?.data?.success) {
         return toast.error("Something went wrong");
       }
@@ -249,13 +222,13 @@ export function useGetMessageHistory(receiverId: string, userName_slug: string) 
   return useQuery({
     queryKey: ["messageHistory", receiverId],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/message/history/${receiverId}/${userName_slug}`);
+      const res = await axiosInstance.get(envVars.NEXT_PUBLIC_MESSAGE_HISTORY + `/${receiverId}/${userName_slug}`);
       if (!res?.data?.success) throw new Error("Failed");
       return res.data.data; // { messages: [...], room_id: '...' }
     },
     enabled: !!receiverId,
     // Prevent React Query from silently refetching and overwriting
-    // our optimistic updates / realtime-appended messages.
+    // optimistic updates / realtime-appended messages.
     staleTime: Infinity,
   });
 }
